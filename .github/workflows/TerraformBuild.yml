@@ -33,7 +33,7 @@ jobs:
 
     # Runs a set of commands using the runners shell
     - name: Copy testing tfvars
-      if: ls terraform/test/*.tfvars
+      if: hashFiles(terraform/test/*.tfvars)
       run: |
         tfvars=$(ls terraform/test/*.tfvars 2> /dev/null)
         env
