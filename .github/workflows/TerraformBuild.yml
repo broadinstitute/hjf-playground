@@ -15,9 +15,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Load Environment variables
+    - name: Create shell env file
       run: |
-        env_files=$(ls terraform/test/*.env)
+        env_files=$(find terraform/test -anme \*.env -print)
         if [ ! -z "${env_files}" ]
         then
             for file in ${env_files}
@@ -27,13 +27,19 @@ jobs:
                  echo "export ${key}=\"${value}\"" >> load.env
               done
             done
-            . load.env
         fi
-        env
 
     # Runs a set of commands using the runners shell
     - name: Copy testing tfvars
       run: |
         tfvars=$(find terraform/test -name \*.tfvars -print)
+        [ -f load.env ] && . load.env
         env
+
+    # Create a new release
+    - name: Tag a new release
+      uses: mathieudutour/github-tag-action@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        tag_prefix: terraform_
         
