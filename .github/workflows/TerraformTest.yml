@@ -39,6 +39,8 @@ jobs:
         [ -f load.env ] && . load.env
         env
 
+    # need to add ctmpl render phase
+
     # Run Terraform fmt (kind of a linter)
     - name: Terraform format check
       uses: hashicorp/terraform-github-actions@master
@@ -61,3 +63,26 @@ jobs:
         tf_actions_working_dir: ${{ env.terraform_directory }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Run Terraform validate 
+    - name: Terraform validate
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: ${{ env.terraform_version }}
+        tf_actions_subcommand: 'validate'
+        tf_actions_comment: true
+        tf_actions_working_dir: ${{ env.terraform_directory }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Run Terraform plan 
+    - name: Terraform plan
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: ${{ env.terraform_version }}
+        tf_actions_subcommand: 'plan'
+        tf_actions_comment: true
+        tf_actions_working_dir: ${{ env.terraform_directory }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
