@@ -34,6 +34,6 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: Copy testing tfvars
       run: |
-        tfvars=$(ls terraform/test/*.tfvars)
+        tfvars=$(ls terraform/test/*.tfvars 2> /dev/null)
         env
         
