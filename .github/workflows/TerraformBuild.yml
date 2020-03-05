@@ -17,7 +17,7 @@ jobs:
 
     - name: Create shell env file
       run: |
-        env_files=$(find terraform/test -anme \*.env -print)
+        env_files=$(find terraform/test -name \*.env -print)
         if [ ! -z "${env_files}" ]
         then
             for file in ${env_files}
