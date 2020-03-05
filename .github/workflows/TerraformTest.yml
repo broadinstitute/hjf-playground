@@ -39,8 +39,8 @@ jobs:
     # Run Terraform fmt (kind of a linter)
     - name Terraform format check
       uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: 0.12.13
-          tf_actions_subcommand: 'fmt'
-          tf_actions_fmt_write: false
-          tf_actions_working_dir: terraform
+      with:
+        tf_actions_version: 0.12.13
+        tf_actions_subcommand: 'fmt'
+        tf_actions_fmt_write: false
+        tf_actions_working_dir: terraform
