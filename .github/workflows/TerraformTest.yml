@@ -9,12 +9,38 @@ on:
     
 
 jobs:
-  build:
+  terraform_test:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
-    # Runs a single command using the runners shell
-    - name: Run a one-line script
-      run: echo perform tests
+    - name: Create shell env file
+      run: |
+        env_files=$(find terraform/test -name \*.env -print)
+        if [ ! -z "${env_files}" ]
+        then
+            for file in ${env_files}
+            do
+              IFS='=' ; cat ${file} | grep -Ev "^#" | while read key value
+              do
+                 echo "export ${key}=\"${value}\"" >> load.env
+              done
+            done
+        fi
+
+    # Runs a set of commands using the runners shell
+    - name: Copy testing tfvars
+      run: |
+        tfvars=$(find terraform/test -name \*.tfvars -print)
+        [ -f load.env ] && . load.env
+        env
+
+    # Run Terraform fmt (kind of a linter)
+    - name Terraform format check
+      uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 0.12.13
+          tf_actions_subcommand: 'fmt'
+          tf_actions_fmt_write: false
+          tf_actions_working_dir: terraform
