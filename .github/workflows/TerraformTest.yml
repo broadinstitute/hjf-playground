@@ -37,7 +37,7 @@ jobs:
         env
 
     # Run Terraform fmt (kind of a linter)
-    - name Terraform format check
+    - name: Terraform format check
       uses: hashicorp/terraform-github-actions@master
       with:
         tf_actions_version: 0.12.13
