@@ -1,0 +1,16 @@
+name: Terraform Build
+
+on:
+  push:
+    branches: 
+      - master
+    paths:
+      - terraform/**
+    
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1

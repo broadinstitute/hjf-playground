@@ -1,0 +1,14 @@
+{{with $infrastructure_id := env "INFRASTRUCTURE_ID"}}
+
+# remote state for base infrastructure
+# by convention all non-prod infrstructures are built in gotc dev
+
+terraform {
+  backend "gcs" {
+    bucket  = "gotc-engineer-terraform-{{if eq "$infrastructure_id" "prod"}}prod{{else}}nonprod{{end}}-state" 
+    prefix  = "auth-proxy"
+  }
+ required_version = ">= 0.12"
+}
+
+{{end}}
