@@ -9,13 +9,31 @@ on:
     
 
 jobs:
-  build:
+  terraform_release:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
-    # Runs a set of commands using the runners shell
-    - name: Run a multi-line script
+    - name: Load Environment variables
       run: |
-        echo Build a terraform config
+        env_files=$(ls terraform/test/*.env)
+        if [ ! -z "${env_files}" ]
+        then
+            for file in ${env_files}
+            do
+              IFS='=' ; cat ${file} | grep -Ev "^#" | while read key value
+              do
+                 echo "export ${key}=\"${value}\"" >> load.env
+              done
+            done
+            . load.env
+        fi
+        env
+
+    # Runs a set of commands using the runners shell
+    - name: Copy testing tfvars
+      run: |
+        tfvars=$(ls terraform/test/*.tfvars)
+        env
+        
