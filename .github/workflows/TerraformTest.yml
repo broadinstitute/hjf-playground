@@ -7,6 +7,9 @@ on:
     paths:
       - terraform/**
     
+env:
+  terraform_directory: "terraform"
+  terraform_version: "0.12.13"
 
 jobs:
   terraform_test:
@@ -40,7 +43,21 @@ jobs:
     - name: Terraform format check
       uses: hashicorp/terraform-github-actions@master
       with:
-        tf_actions_version: 0.12.13
+        tf_actions_version: ${{ env.terraform_version }}
         tf_actions_subcommand: 'fmt'
         tf_actions_fmt_write: false
-        tf_actions_working_dir: terraform
+        tf_actions_comment: true
+        tf_actions_working_dir: ${{ env.terraform_directory }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Run Terraform init 
+    - name: Terraform init
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: ${{ env.terraform_version }}
+        tf_actions_subcommand: 'init'
+        tf_actions_comment: true
+        tf_actions_working_dir: ${{ env.terraform_directory }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
