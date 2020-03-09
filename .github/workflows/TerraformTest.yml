@@ -18,6 +18,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Get-changed-list
+      uses: lots0logs/gh-action-get-changed-files@2.0.6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo steps.Get-changed-list.outputs.files
+
     - name: Create shell env file
       run: |
         env_files=$(find terraform/test -name \*.env -print)
