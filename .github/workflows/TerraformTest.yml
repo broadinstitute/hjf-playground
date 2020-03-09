@@ -25,7 +25,7 @@ jobs:
 
     - name: Output change list
       run: |
-        echo steps.Get-changed-list.outputs.files
+        echo '${{ steps.Get-changed-list.outputs.files }}'
 
     - name: Create shell env file
       run: |
