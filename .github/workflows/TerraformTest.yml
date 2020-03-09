@@ -18,7 +18,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Get-changed-list
+    - id: Get-changed-list
       uses: trilom/file-changes-action@v1
       with:
         githubToken: ${{ secrets.GITHUB_TOKEN }}
