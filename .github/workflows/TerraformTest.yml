@@ -22,6 +22,8 @@ jobs:
       uses: lots0logs/gh-action-get-changed-files@2.0.6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Output change list
       run: |
         echo steps.Get-changed-list.outputs.files
 
