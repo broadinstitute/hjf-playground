@@ -24,9 +24,23 @@ jobs:
           git fetch origin ${{ github.base_ref }}
           echo "::set-output name=files::$(git diff --name-only origin/${{ github.base_ref }} ${{ github.sha }} | xargs)"
 
-    - name: echo output
+    - name: get list of apps modified
+      id: getapps
       run: |
-        echo ${{ steps.getfile.outputs.files }}
+        for file in  ${{ steps.getfile.outputs.files }}
+        do
+            app=$(echo ${file} | cut -d '/' -f2)
+            if [[ ! -z "${app}" ]] && grep -s "${app}" "${apps}"
+            then
+                 apps="${apps} ${app}"
+            fi
+        done
+        echo "::set-output name=apps::$(echo $apps)"
+
+    - name: output info
+      run: |
+        echo "file list: "  ${{ steps.getfile.outputs.files }}
+        echo "apps list: " ${{ steps.getapps.outputs.apps }}
 
     - name: Create shell env file
       run: |
