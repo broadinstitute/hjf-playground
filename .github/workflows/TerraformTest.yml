@@ -18,14 +18,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - id: Get-changed-list
-      uses: trilom/file-changes-action@v1
+    - id: changed_list
+      uses: trilom/file-changes-action@v1.1.1
       with:
         githubToken: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Output change list
       run: |
-        echo '${{ steps.Get-changed-list.outputs.files }}'
+        cat $HOME/files.json
+        echo '${{ steps.changed_list.outputs.files }}'
 
     - name: Create shell env file
       run: |
