@@ -30,7 +30,7 @@ jobs:
         for file in  ${{ steps.getfile.outputs.files }}
         do
             app=$(echo ${file} | cut -d '/' -f2)
-            if [[ ! -z "${app}" ]] && grep -s "${app}" "${apps}"
+            if [[ ! -z "${app}" ]] && ! grep -s "${app}" "${apps}"
             then
                  apps="${apps} ${app}"
             fi
