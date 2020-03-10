@@ -18,15 +18,22 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - id: changed_list
-      uses: trilom/file-changes-action@v1.0.0
-      with:
-        githubToken: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Output change list
       run: |
-        cat $HOME/files.json
-        echo '${{ steps.changed_list.outputs.files }}'
+       # use git diff to get list of changes
+       changed_list=$(git diff --name-only ${{github.head_ref}}  ${{github.base_ref}})
+       check_change() {
+            pattern=$1
+            # assume not found is default - non-zero return status
+            retcode=1
+            # loop through list comparing against pattern
+            for chg in $changed_list
+            do
+                (echo $chg | grep -Eq "$pattern") && retcode=0
+            done
+            return $retcode
+        }
+        echo "${changed_list}"
 
     - name: Create shell env file
       run: |
