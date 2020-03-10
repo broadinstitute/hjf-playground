@@ -1,7 +1,7 @@
 
 
 provider "google" {
-    project = "some-project"
-    region  = "us-central1"
+  project = "some-project"
+  region  = "us-central1"
 }
 
