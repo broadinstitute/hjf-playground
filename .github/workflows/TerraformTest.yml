@@ -21,7 +21,7 @@ jobs:
     - name: Output change list
       run: |
        # use git diff to get list of changes
-       changed_list=$(git diff --name-only HEAD  ${{github.base_ref}})
+       changed_list=$(git diff --name-only HEAD  origin/${{github.base_ref}})
        check_change() {
             pattern=$1
             # assume not found is default - non-zero return status
