@@ -1,4 +1,4 @@
-name: Terraform Test
+name: Terraform Test - firewall_rule
 
 env:
   terraform_directory: "terraform/firewall_rule"
@@ -9,7 +9,7 @@ on:
     branches: 
       - master
     paths:
-      - ${{ env.terraform_directory }}/**
+      - terraform/firewall_rule/**
     
 jobs:
   terraform_test:
