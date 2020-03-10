@@ -27,10 +27,11 @@ jobs:
     - name: get list of apps modified
       id: getapps
       run: |
+        apps=""
         for file in  ${{ steps.getfile.outputs.files }}
         do
             app=$(echo ${file} | cut -d '/' -f2)
-            if [[ ! -z "${app}" ]] && ! grep -s "${app}" "${apps}"
+            if [[ ! -z "${app}" ]] && [[ ! $apps =~ (^|[[:space:]])"$app"($|[[:space:]]) ]] 
             then
                  apps="${apps} ${app}"
             fi
