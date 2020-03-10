@@ -18,22 +18,14 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Output change list
+    - name: get changed files
+      id: getfile
       run: |
-       # use git diff to get list of changes
-       changed_list=$(git diff --name-only HEAD  origin/${{github.base_ref}})
-       check_change() {
-            pattern=$1
-            # assume not found is default - non-zero return status
-            retcode=1
-            # loop through list comparing against pattern
-            for chg in $changed_list
-            do
-                (echo $chg | grep -Eq "$pattern") && retcode=0
-            done
-            return $retcode
-        }
-        echo "${changed_list}"
+          echo "::set-output name=files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | xargs)"
+
+    - name: echo output
+      run: |
+        echo ${{ steps.getfile.outputs.files }}
 
     - name: Create shell env file
       run: |
