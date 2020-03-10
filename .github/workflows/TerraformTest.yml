@@ -21,8 +21,8 @@ jobs:
     - name: get changed files
       id: getfile
       run: |
-          git checkout origin/${{ github.base_ref }}
-          echo "::set-output name=files::$(git diff --name-only ${{ github.base_ref }} ${{ github.sha }} | xargs)"
+          git fetch origin ${{ github.base_ref }}
+          echo "::set-output name=files::$(git diff --name-only origin/${{ github.base_ref }} ${{ github.sha }} | xargs)"
 
     - name: echo output
       run: |
