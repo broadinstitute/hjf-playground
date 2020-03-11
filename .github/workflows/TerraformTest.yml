@@ -5,7 +5,7 @@ on:
     branches: 
       - master
     paths:
-      - terraform/**
+      - terraform-test/**
     
 env:
   terraform_directory: "terraform"

@@ -53,13 +53,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     # Run Terraform plan 
-    - name: Terraform plan
-      uses: hashicorp/terraform-github-actions@master
-      with:
-        tf_actions_version: ${{ env.terraform_version }}
-        tf_actions_subcommand: 'plan'
-        tf_actions_comment: true
-        tf_actions_working_dir: ${{ env.terraform_directory }}/test
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#  Plan will have to wait until we can use vault to get creds
+#
+#    - name: Terraform plan
+#      uses: hashicorp/terraform-github-actions@master
+#      with:
+#        tf_actions_version: ${{ env.terraform_version }}
+#        tf_actions_subcommand: 'plan'
+#        tf_actions_comment: true
+#        tf_actions_working_dir: ${{ env.terraform_directory }}/test
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
