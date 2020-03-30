@@ -1,0 +1,96 @@
+name: Terraform Deploy Test - gotc-dev
+
+env:
+  terraform_directory: "deploy/gotc-test"
+  terraform_version: "0.12.20"
+
+on:
+  pull_request:
+    branches: 
+      - master
+    paths:
+      - deploy/gotc-test/**
+    
+jobs:
+  terraform_plan_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Run Terraform fmt (kind of a linter)
+    - name: Terraform format check
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: ${{ env.terraform_version }}
+        tf_actions_subcommand: 'fmt'
+        tf_actions_fmt_write: false
+        tf_actions_comment: true
+        tf_actions_working_dir: ${{ env.terraform_directory }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Get secret from vault
+    - name: Authenticate to Gcloud
+      id: gcloud
+      run: |
+        VAULT_TOKEN=$(curl \
+            --request POST \
+            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
+            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
+        echo ::add-mask::${VAULT_TOKEN}
+        echo ::set-env name=VAULT_TOKEN::${VAULT_TOKEN}
+        if [ -z "${VAULT_TOKEN}" ] ; then
+           echo "Vault authentication failed!" 
+           exit 1
+        fi
+        curl --silent -H "X-Vault-Token: ${VAULT_TOKEN}" -X GET \
+             ${VAULT_ADDR}/v1/secret/dsde/gotc/dev/ci/ci-non-prod-service-account.json \
+             | jq .data > sa.json
+        if [ ! -s sa.json ] ; then
+           echo "Retrieval of Gcloud SA credentials failed" 
+           exit 1
+        fi
+        gcloud auth activate-service-account --key-file=sa.json
+        if [ $? -ne 0 ] ; then
+           echo "Gcloud auth failed!"
+           exit 1
+        fi
+        env:
+          ROLE_ID: ${{ secrets.ROLE_ID }}
+          SECRET_ID: ${{ secrets.SECRET_ID }}
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+
+    # Run Terraform init 
+    - name: Terraform init
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: ${{ env.terraform_version }}
+        tf_actions_subcommand: 'init'
+        tf_actions_comment: true
+        tf_actions_working_dir: ${{ env.terraform_directory }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Run Terraform validate 
+    - name: Terraform validate
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: ${{ env.terraform_version }}
+        tf_actions_subcommand: 'validate'
+        tf_actions_comment: true
+        tf_actions_working_dir: ${{ env.terraform_directory }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Run Terraform plan 
+    - name: Terraform plan
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: ${{ env.terraform_version }}
+        tf_actions_subcommand: 'plan'
+        tf_actions_comment: true
+        tf_actions_working_dir: ${{ env.terraform_directory }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
