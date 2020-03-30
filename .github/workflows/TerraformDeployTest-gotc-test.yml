@@ -36,14 +36,14 @@ jobs:
       run: |
         VAULT_TOKEN=$(curl \
             --request POST \
-            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
+            --data '{"role_id":"${ROLE_ID}","secret_id":"${SECRET_ID}"}' \
             ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
-        echo ::add-mask::${VAULT_TOKEN}
-        echo ::set-env name=VAULT_TOKEN::${VAULT_TOKEN}
         if [ -z "${VAULT_TOKEN}" ] ; then
            echo "Vault authentication failed!" 
            exit 1
         fi
+        echo ::add-mask::${VAULT_TOKEN}
+        echo ::set-env name=VAULT_TOKEN::${VAULT_TOKEN}
         curl --silent -H "X-Vault-Token: ${VAULT_TOKEN}" -X GET \
              ${VAULT_ADDR}/v1/secret/dsde/gotc/dev/ci/ci-non-prod-service-account.json \
              | jq .data > sa.json
