@@ -33,6 +33,10 @@ jobs:
     # Get secret from vault
     - name: Authenticate to Gcloud
       id: gcloud
+      env:
+        ROLE_ID: ${{ secrets.ROLE_ID }}
+        SECRET_ID: ${{ secrets.SECRET_ID }}
+        VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
       run: |
         VAULT_TOKEN=$(curl \
             --request POST \
@@ -56,10 +60,6 @@ jobs:
            echo "Gcloud auth failed!"
            exit 1
         fi
-        env:
-          ROLE_ID: ${{ secrets.ROLE_ID }}
-          SECRET_ID: ${{ secrets.SECRET_ID }}
-          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
 
     # Run Terraform init 
     - name: Terraform init
