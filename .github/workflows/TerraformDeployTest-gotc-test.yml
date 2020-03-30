@@ -36,7 +36,7 @@ jobs:
       run: |
         VAULT_TOKEN=$(curl \
             --request POST \
-            --data '{"role_id":"${ROLE_ID}","secret_id":"${SECRET_ID}"}' \
+            --data "{\"role_id\":\"${ROLE_ID}\",\"secret_id\":\"${SECRET_ID}\"}" \
             ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
         if [ -z "${VAULT_TOKEN}" ] ; then
            echo "Vault authentication failed!" 
