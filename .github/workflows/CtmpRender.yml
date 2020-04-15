@@ -41,5 +41,7 @@ jobs:
         VAULT_TOKEN: ${{ env.VAULT_TOKEN }}
         DEST_DIR: /github/workspace/terraform/test
 
-
+    - name: show
+      run: |
+        ls -alR terraform/test
 
