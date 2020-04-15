@@ -41,6 +41,7 @@ jobs:
         mkdir terraform/output
 
   render_cmtpls:
+    runs-on: ubuntu-latest
     container:
       image: broadinstitute/configurator-base:gomplate
       env:
@@ -48,6 +49,8 @@ jobs:
       volumes:
         - ${{ GITHUB_WORKSPACE }}/terraform/test:/configs
         - ${{ GITHUB_WORKSPACE }}/terraform/output:/working
+    steps:
+    - name: command
       run: |
         echo "run"
     
