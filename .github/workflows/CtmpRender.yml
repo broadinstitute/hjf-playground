@@ -54,4 +54,11 @@ jobs:
       run: |
         /usr/local/bin/cp-config.sh
     
+  output_results:
+    runs-on: ubuntu-latest
+    steps:
+    - name: output results
+      run: |
+        ls -alR /home/runner/work/hjf-playground/hjf-playgroud/output
+
 
