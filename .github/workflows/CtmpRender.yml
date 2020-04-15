@@ -34,12 +34,12 @@ jobs:
         fi
         echo ::add-mask::${VAULT_TOKEN}
         echo ::set-env name=VAULT_TOKEN::${VAULT_TOKEN}
-        echo "${VAULT_TOKEN}" > tokenfile
-   - name: render
-     uses: broadinstitute/github-action-template-render@master
-     env:
-       VAULT_TOKEN: ${{ VAULT_TOKEN }}
-       DEST_DIR: terraform/test
+
+    - name: render
+      uses: broadinstitute/github-action-template-render@master
+      env:
+        VAULT_TOKEN: ${{ VAULT_TOKEN }}
+        DEST_DIR: terraform/test
 
 
 
