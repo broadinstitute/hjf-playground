@@ -52,6 +52,6 @@ jobs:
     steps:
     - name: command
       run: |
-        echo "run"
+        /usr/local/bin/cp-config.sh
     
 
