@@ -39,7 +39,7 @@ jobs:
       uses: broadinstitute/github-action-template-render@master
       env:
         VAULT_TOKEN: ${{ env.VAULT_TOKEN }}
-        DEST_DIR: /github/workspace/terraform/test
+        DEST_PATH: /github/workspace/terraform/test
 
     - name: show
       run: |
