@@ -48,5 +48,7 @@ jobs:
       volumes:
         - ${{ GITHUB_WORKSPACE }}/terraform/test:/configs
         - ${{ GITHUB_WORKSPACE }}/terraform/output:/working
+      run: |
+        echo "run"
     
 
