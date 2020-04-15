@@ -45,7 +45,7 @@ jobs:
     container:
       image: broadinstitute/configurator-base:gomplate
       env:
-        VAULT_TOKEN:${{ env.VAULT_TOKEN }}
+        VAULT_TOKEN:${VAULT_TOKEN}
       volumes:
         - ${{ GITHUB_WORKSPACE }}/terraform/test:/configs
         - ${{ GITHUB_WORKSPACE }}/terraform/output:/working
