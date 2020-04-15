@@ -16,7 +16,7 @@ jobs:
       uses: actions/checkout@v2
 
     # Get secret from vault
-    - name: vault token
+    - name: vault-token
       id: vault
       env:
         ROLE_ID: ${{ secrets.ROLE_ID }}
@@ -38,8 +38,8 @@ jobs:
     - name: render
       uses: broadinstitute/github-action-template-render@master
       env:
-        VAULT_TOKEN: ${{ VAULT_TOKEN }}
-        DEST_DIR: terraform/test
+        VAULT_TOKEN: ${{ env.VAULT_TOKEN }}
+        DEST_DIR: ${GITHUB_WORKSPACE}/terraform/test
 
 
 
