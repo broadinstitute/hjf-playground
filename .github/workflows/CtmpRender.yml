@@ -36,7 +36,7 @@ jobs:
         echo ::set-env name=VAULT_TOKEN::${VAULT_TOKEN}
 
     - name: render
-      uses: broadinstitute/github-action-template-render@0.1.1
+      uses: broadinstitute/github-action-template-render@v0.1.1
       env:
         DEST_PATH: /github/workspace/terraform/test
 
