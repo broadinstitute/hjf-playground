@@ -38,10 +38,10 @@ jobs:
     - name: render
       uses: broadinstitute/github-action-template-render@master
       env:
-        VAULT_TOKEN: ${{ env.VAULT_TOKEN }}
         DEST_PATH: /github/workspace/terraform/test
 
     - name: show
       run: |
         ls -alR terraform/test
 
+#        VAULT_TOKEN: ${{ env.VAULT_TOKEN }}
