@@ -31,5 +31,16 @@ variable "region" {
   description = "Default region"
 }
 
+#
+# NOTE: Until the informaiton belowis exported (as an output) to the base infrastructure
+#  need to set it here.  
 
+variable "network_name" {
+  type    = string
+  default = "app-network"
+}
 
+variable "subnetwork_name" {
+  type    = string
+  default = "app-network"
+}
