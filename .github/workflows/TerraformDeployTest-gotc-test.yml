@@ -78,7 +78,6 @@ jobs:
         tf_actions_working_dir: ${{ env.terraform_directory }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TF_WORKSPACE: pr_test
 
     # Run Terraform validate 
     - name: Terraform validate
@@ -102,5 +101,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TF_CLI_ARGS: -lock=false
-        TF_WORKSPACE: pr_test
 
