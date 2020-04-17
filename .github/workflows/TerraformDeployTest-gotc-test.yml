@@ -100,4 +100,5 @@ jobs:
         tf_actions_working_dir: ${{ env.terraform_directory }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TF_CLI_ARGS: -lock=false
 
