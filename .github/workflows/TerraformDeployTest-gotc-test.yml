@@ -2,7 +2,7 @@ name: Terraform Deploy Test - gotc-dev
 
 env:
   terraform_directory: "deploy/gotc-test"
-  terraform_version: "0.12.20"
+  terraform_version: "0.12.21"
 
 on:
   pull_request:
