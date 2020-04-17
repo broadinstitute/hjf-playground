@@ -1,0 +1,7 @@
+.terraform/*
+.terraform.d/*
+terraform.tfstate
+terraform.tfstate.backup
+*.key
+*.crt
+plan.out
