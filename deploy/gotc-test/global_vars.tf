@@ -30,3 +30,6 @@ variable "region" {
   default     = "us-central1"
   description = "Default region"
 }
+
+
+
