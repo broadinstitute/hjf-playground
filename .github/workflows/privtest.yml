@@ -39,10 +39,14 @@ jobs:
         echo ::add-mask::${SSH_KEY}
         echo ::set-env name=SSH_KEY::${SSH_KEY}
 
+    - name: setup-ssh-agent
+      uses:  webfactory/ssh-agent@v0.2.0
+      with:
+         ssh-private-key: ${{ env.SSH_KEY }}
+
     - name: checkout-private
       uses: actions/checkout@v2
       with:
-        ssh-key: ${{ env.SSH_KEY }}
         repository: "broadinstitute/gotc"
 
     - name: show
