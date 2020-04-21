@@ -42,7 +42,7 @@ jobs:
     - name: setup-ssh-agent
       uses:  webfactory/ssh-agent@v0.2.0
       with:
-         ssh-private-key: ${{ secret.TEST_KEY }}
+         ssh-private-key: ${{ secrets.TEST_KEY }}
 #         ssh-private-key: "${{ env.SSH_KEY }}"
 
     - name: checkout-private
