@@ -1,0 +1,52 @@
+name: private repo
+
+on:
+  push:
+    branches: 
+      - master
+    paths:
+      - terraform/test/**
+    
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Get secret from vault
+    - name: vault-token
+      id: vault
+      env:
+        ROLE_ID: ${{ secrets.ROLE_ID }}
+        SECRET_ID: ${{ secrets.SECRET_ID }}
+        VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+      run: |
+        # get vault token using role-id and secret-id
+        VAULT_TOKEN=$(curl \
+            --request POST \
+            --data "{\"role_id\":\"${ROLE_ID}\",\"secret_id\":\"${SECRET_ID}\"}" \
+            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
+        if [ -z "${VAULT_TOKEN}" ] ; then
+           echo "Vault authentication failed!"
+           exit 1
+        fi
+        echo ::add-mask::${VAULT_TOKEN}
+        echo ::set-env name=VAULT_TOKEN::${VAULT_TOKEN}
+        SSH_KEY=$(curl --silent -H "X-Vault-Token: ${VAULT_TOKEN}" -X GET \
+             ${VAULT_ADDR}/v1/secret/dsde/gotc/dev/ci/test-hjf.key \
+             | jq .data.private_key | tr -d '"')
+        echo ::add-mask::${SSH_KEY}
+        echo ::set-env name=SSH_KEY::${SSH_KEY}
+
+    - name: checkout-private
+      uses: actions/checkout@v2
+      with:
+        ssh-key: ${{ env.SSH_KEY }}
+        repository: "git@github.com:broadinstitute/gotc.git"
+
+    - name: show
+      run: |
+        ls -alR ${GITHUB_WORKSPACE}
+
