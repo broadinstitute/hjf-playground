@@ -6,7 +6,6 @@ on:
       - master
     paths:
       - terraform/test/**
-    
 
 jobs:
   prepare:
@@ -36,7 +35,7 @@ jobs:
         echo ::set-env name=VAULT_TOKEN::${VAULT_TOKEN}
         SSH_KEY=$(curl --silent -H "X-Vault-Token: ${VAULT_TOKEN}" -X GET \
              ${VAULT_ADDR}/v1/secret/dsde/gotc/dev/ci/test-hjf.key \
-             | jq .data.private_key | tr -d '"')
+             | jq .data.private_key | tr -d '"' | perl -0777 -pe 's/\\n/\n/g' )
         echo ::add-mask::${SSH_KEY}
         echo ::set-env name=SSH_KEY::${SSH_KEY}
 
