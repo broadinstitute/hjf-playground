@@ -46,9 +46,8 @@ jobs:
 #         ssh-private-key: "${{ env.SSH_KEY }}"
 
     - name: checkout-private
-      uses: actions/checkout@v2
-      with:
-        repository: "broadinstitute/gotc"
+      run: |
+        git clone git@github.com:broadinstitute/gotc.git      
 
     - name: show
       run: |
