@@ -1,0 +1,42 @@
+
+# get list of changed files
+changed_files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}) 
+
+# find all charts that have changed files
+
+# will not lint nor verify that Chart.yaml has been updated since assuming PR
+#  test takes care of this
+
+# list of changed charts
+CHART_LIST="hjf-test-chart"
+
+TMPDIR=".deploy"
+# make directory to write helm packages
+mkdir -p ${TMPDIR}
+
+# run packager for all changed charts
+for chart in ${CHART_LIST}
+do
+   echo "Creating package for chart - ${chart} ...."
+   helm3 package helm/${chart} --destination ${TMPDIR}
+done
+
+# render cr.yaml with token
+
+# run docker cr providing cr.yaml and package directory
+
+docker run -it --rm  -v ${PWD}/cr.yaml:/working/cr.yaml -v ${PWD}/${TMPDIR}:/deploy quay.io/helmpack/chart-releaser:v0.2.3 cr upload --package-path /deploy --config /working/cr.yaml
+
+# clone helm repo 
+ git clone git@github.com:broadinstitute/gotc-helm-repo.git
+
+# check out gh-pages branch
+( cd gotc-helm-repo && git checkout gh-pages )
+
+# 
+docker run -it --rm  -v ${PWD}/cr.yaml:/working/cr.yaml -v ${PWD}/${TMPDIR}:/deploy -v ${PWD}/gotc-helm-repo:/index quay.io/helmpack/chart-releaser:v0.2.3 cr index --package-path /deploy --index-path /index/index.yaml --config /working/cr.yaml
+
+# add commit push
+(cd gotc-helm-repo && git add index.yaml && git commit -m "release charts - ${CHART_LSIT}" && git push origin gh-pages)
+
+
