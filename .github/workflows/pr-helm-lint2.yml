@@ -69,25 +69,23 @@ jobs:
       - name: Add all charts to ct.yaml
         run: |
            cat changed-charts.txt
-#          CHART_LIST=$(find helm -type d -maxdepth 1 ! -name "helm" -print)
-#          echo ::set-env name=CHART_LIST::${CHART_LIST}
-#          for chart in ${CHART_LIST}
-#          do
-#            echo "  - ${chart}" >> helm/ct.yaml
-#          done
-#
+          for chart in $(cat changed-charts.txt)
+          do
+            echo "  - ${chart}" >> helm/ct.yaml
+          done
+
 #        # `ct lint` likes to find charts on its own using git
 #        # history.
-#      - name: Fetch History
-#        run: git fetch --prune --unshallow
+      - name: Fetch History
+        run: git fetch --prune --unshallow
 #
 #        # We keep this around because it does version bump and
 #        # maintenance checks outside of what `helm lint` does.
 #        # It is separate because this needs to be at the top of
 #        # the repo, and it is cleaner to use the
 #        # working-directory directive below.
-#      - name: Chart Test Basic Lint
-#        run: ct lint --config helm/ct.yaml
+      - name: Chart Test Basic Lint
+        run: ct lint --config helm/ct.yaml
 #
 #        # These are each actually run by `ct lint`, but we want
 #        # to see their output and set arguments ourselves
