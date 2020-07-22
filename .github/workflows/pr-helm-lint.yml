@@ -18,7 +18,9 @@ jobs:
 
       - name: Add all charts to ct.yaml
         run: |
-          find helm -type d -depth 1 -print | while read chart
+          CHART_LIST=$(find helm -type d -maxdepth 1 -print)
+          echo ::set-env name=CHART_LIST::${CHART_LIST}
+          for chart in ${CHART_LIST}
           do
             echo "  - ${chart}" >> helm/ct.yaml
           done
@@ -60,8 +62,8 @@ jobs:
         run: |
           for chart in {{ env.CHART_LIST }}
           do
-              helm lint --strict --namespace default helm/${chart}
-              yamale --schema /etc/ct/chart_schema.yaml helm/${chart}/Chart.yaml
-              yamllint --config-file /etc/ct/lintconf.yaml --strict helm/${chart}/Chart.yaml helm/${chart}/values.yaml
+              helm lint --strict --namespace default ${chart}
+              yamale --schema /etc/ct/chart_schema.yaml ${chart}/Chart.yaml
+              yamllint --config-file /etc/ct/lintconf.yaml --strict ${chart}/Chart.yaml helm/${chart}/values.yaml
           done
 
