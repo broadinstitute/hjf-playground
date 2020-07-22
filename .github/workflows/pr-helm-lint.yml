@@ -66,6 +66,6 @@ jobs:
           do
               helm lint --strict --namespace default ${chart}
               yamale --schema /etc/ct/chart_schema.yaml ${chart}/Chart.yaml
-              yamllint --config-file /etc/ct/lintconf.yaml --strict ${chart}/Chart.yaml helm/${chart}/values.yaml
+              yamllint --config-file /etc/ct/lintconf.yaml --strict ${chart}/Chart.yaml ${chart}/values.yaml
           done
 
