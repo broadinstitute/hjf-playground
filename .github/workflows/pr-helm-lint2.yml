@@ -91,14 +91,13 @@ jobs:
 #        # (--strict). Because this GitHub Action is infrequently
 #        # run, duplicating the checks for the sake of keeping
 #        # this Action simple is worth it.
-#      - name: Helm Chart Strict Lint
+      - name: Helm Chart Strict Lint
 #        env:
 #          CHART_LIST: ${{ env.CHART_LIST }}
-#        run: |
-#          for chart in ${CHART_LIST}
-#          do
-#              helm lint --strict --namespace default ${chart}
-#              yamale --schema /etc/ct/chart_schema.yaml ${chart}/Chart.yaml
-#              yamllint --config-file /etc/ct/lintconf.yaml --strict ${chart}/Chart.yaml ${chart}/values.yaml
-#          done
-#
+        run: |
+          for chart in $(cat changed-charts.txt)
+          do
+              helm lint --strict --namespace default helm/${chart}
+              yamale --schema /etc/ct/chart_schema.yaml helm/${chart}/Chart.yaml
+              yamllint --config-file /etc/ct/lintconf.yaml --strict helm/${chart}/Chart.yaml helm/${chart}/values.yaml
+          done
