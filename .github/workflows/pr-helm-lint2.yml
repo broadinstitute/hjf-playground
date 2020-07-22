@@ -14,14 +14,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Get chagned files
+      - name: Get changed files
+        id: changed-files
         uses: lots0logs/gh-action-get-changed-files@2.1.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get Chart list from changed files
         run: |
-           ls -al
+           echo "${{ steps.changed-files.output.all }}"
 #          jq . < files.json
 #          # CHART_LIST=$(git diff-tree --no-commit-id --name-only -r ${{ env.GITHUB_SHA }} | grep -E "^helm" | cut -d '/' -f2 | sort | uniq | grep -Ev "ct.yaml|cr.yaml")
 #          # echo ::set-env name=CHART_LIST::${CHART_LIST}
