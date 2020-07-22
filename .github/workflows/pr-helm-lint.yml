@@ -5,7 +5,7 @@ name: Helm Chart Linting on Pull Requests
 on:
   pull_request:
     paths:
-      - helm/**
+      - disable-helm/**
 
 jobs:
   lint:
