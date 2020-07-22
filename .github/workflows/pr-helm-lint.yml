@@ -1,0 +1,54 @@
+# This workflow triggers helm linting on PRs and master branch pushes
+# that affect helm files
+name: Helm Chart Linting on Pull Requests
+
+on:
+  pull_request:
+    paths:
+      - helm/**
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/helmpack/chart-testing:v3.0.0-rc.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get Helm Charts updated
+        run: |
+          CHART_LIST=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -E "^helm" | cut -d '/' -f2 | sort | uniq | grep -Ev "ct.yaml|cr.yaml")
+          echo ::set-env name=CHART_LIST::${CHART_LIST}
+          for chart in ${CHART_LIST}
+          do
+             echo "  - helm/${chart}" >> helm/ct.yaml
+          done
+
+        # `ct lint` likes to find charts on its own using git
+        # history.
+      - name: Fetch History
+        run: git fetch --prune --unshallow
+
+        # We keep this around because it does version bump and
+        # maintenance checks outside of what `helm lint` does.
+        # It is separate because this needs to be at the top of
+        # the repo, and it is cleaner to use the
+        # working-directory directive below.
+      - name: Chart Test Basic Lint
+        run: ct lint --config helm/ct.yaml
+
+        # These are each actually run by `ct lint`, but we want
+        # to see their output and set arguments ourselves
+        # (--strict). Because this GitHub Action is infrequently
+        # run, duplicating the checks for the sake of keeping
+        # this Action simple is worth it.
+      - name: Helm Chart Strict Lint
+        run: |
+          for chart in {{ env.CHART_LIST }}
+          do
+              helm lint --strict --namespace default helm/${chart}
+              yamale --schema /etc/ct/chart_schema.yaml helm/${chart}/Chart.yaml
+              yamllint --config-file /etc/ct/lintconf.yaml --strict helm/${chart}/Chart.yaml helm/${chart}/values.yaml
+          done
+
