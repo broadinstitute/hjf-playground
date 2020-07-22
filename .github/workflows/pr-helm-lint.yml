@@ -59,8 +59,10 @@ jobs:
         # run, duplicating the checks for the sake of keeping
         # this Action simple is worth it.
       - name: Helm Chart Strict Lint
+        env:
+          CHART_LIST: ${{ env.CHART_LIST }}
         run: |
-          for chart in {{ env.CHART_LIST }}
+          for chart in ${CHART_LIST}
           do
               helm lint --strict --namespace default ${chart}
               yamale --schema /etc/ct/chart_schema.yaml ${chart}/Chart.yaml
