@@ -68,7 +68,6 @@ jobs:
 
       - name: Add all charts to ct.yaml
         run: |
-           cat changed-charts.txt
           for chart in $(cat changed-charts.txt)
           do
             echo "  - ${chart}" >> helm/ct.yaml
