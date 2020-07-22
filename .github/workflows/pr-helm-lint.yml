@@ -18,7 +18,7 @@ jobs:
 
       - name: Add all charts to ct.yaml
         run: |
-          CHART_LIST=$(find helm -type d -maxdepth 1 -print)
+          CHART_LIST=$(find helm -type d -maxdepth 1 ! -name "helm" -print)
           echo ::set-env name=CHART_LIST::${CHART_LIST}
           for chart in ${CHART_LIST}
           do
