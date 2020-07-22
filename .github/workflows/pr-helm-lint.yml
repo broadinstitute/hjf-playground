@@ -17,13 +17,17 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Get Helm Charts updated
+        uses: lots0logs/gh-action-get-changed-files@2.1.4
+        with:
+          token: GITHUB_TOKEN
         run: |
-          CHART_LIST=$(git diff-tree --no-commit-id --name-only -r ${{ env.GITHUB_SHA }} | grep -E "^helm" | cut -d '/' -f2 | sort | uniq | grep -Ev "ct.yaml|cr.yaml")
-          echo ::set-env name=CHART_LIST::${CHART_LIST}
-          for chart in ${CHART_LIST}
-          do
-             echo "  - helm/${chart}" >> helm/ct.yaml
-          done
+          jq . < files.json
+          # CHART_LIST=$(git diff-tree --no-commit-id --name-only -r ${{ env.GITHUB_SHA }} | grep -E "^helm" | cut -d '/' -f2 | sort | uniq | grep -Ev "ct.yaml|cr.yaml")
+          # echo ::set-env name=CHART_LIST::${CHART_LIST}
+          # for chart in ${CHART_LIST}
+          # do
+          #    echo "  - helm/${chart}" >> helm/ct.yaml
+          # done
 
         # `ct lint` likes to find charts on its own using git
         # history.
