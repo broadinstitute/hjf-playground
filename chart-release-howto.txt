@@ -7,6 +7,24 @@ changed_files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})
 # will not lint nor verify that Chart.yaml has been updated since assuming PR
 #  test takes care of this
 
+chartlist=()
+for file in ${changed_files} 
+do    
+   if echo $file | grep -qE "^helm/"; then
+     subdir=$(echo $file | cut -d '/' -f2)
+     if [[ "${subdir}" != "ct.yaml" && "${subdir}" != "cr.yaml.ctmpl" ]]
+     then
+         if [[ ! " ${chartlist[@]} " =~ " ${subdir} " ]] 
+         then
+             chartlist+=( "${subdir}" )
+         fi
+         
+         echo $subdir
+     fi
+   fi
+done
+
+
 # list of changed charts
 CHART_LIST="hjf-test-chart"
 

@@ -22,25 +22,53 @@ jobs:
 
       - name: Get Chart list from changed files
         run: |
-           echo "${{ steps.changed-files.outputs.all }}"
-#          jq . < files.json
-#          # CHART_LIST=$(git diff-tree --no-commit-id --name-only -r ${{ env.GITHUB_SHA }} | grep -E "^helm" | cut -d '/' -f2 | sort | uniq | grep -Ev "ct.yaml|cr.yaml")
-#          # echo ::set-env name=CHART_LIST::${CHART_LIST}
-#          # for chart in ${CHART_LIST}
-#          # do
-#          #    echo "  - helm/${chart}" >> helm/ct.yaml
-#          # done
+           # process list of changed files
+           changed_files=$(echo "${{ steps.changed-files.outputs.all }}" | tr -d '[|]' | sed -e 's;,; ;g')
+           chartlist=()
+           # for each file see if it part of a helm chart
+           for file in ${changed_files}
+           do
+              if echo $file | grep -qE "^helm/" 
+              then
+                 # file under helm directory get subdir name
+                 subdir=$(echo $file | cut -d '/' -f2)
+                 # ignore certain files
+                 if [[ "${subdir}" != "ct.yaml" && "${subdir}" != "cr.yaml.ctmpl" ]]
+                 then
+                    # check if we seen this subdir before
+                    if [[ ! " ${chartlist[@]} " =~ " ${subdir} " ]]
+                    then
+                        # add to changed chart list
+                        chartlist+=( "${subdir}" )
+                    fi
+                 fi
+             fi
+           done
+           # write to file
+           echo "${chartlist[@]}" > changed-charts.txt
 
-#  lint:
-#    runs-on: ubuntu-latest
-#    container:
-#      image: quay.io/helmpack/chart-testing:v3.0.0-rc.1
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#
-#      - name: Add all charts to ct.yaml
-#        run: |
+      - name: archive changed chart list
+        uses: actions/upload-artifact@v2
+        with:
+          name: changed-charts
+          path: changed-charts.txt
+
+  lint:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/helmpack/chart-testing:v3.0.0-rc.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: download changed chart list
+        uses: actions/download-artifact@v2
+        with:
+          name: changed-charts
+
+      - name: Add all charts to ct.yaml
+        run: |
+           cat changed-charts.txt
 #          CHART_LIST=$(find helm -type d -maxdepth 1 ! -name "helm" -print)
 #          echo ::set-env name=CHART_LIST::${CHART_LIST}
 #          for chart in ${CHART_LIST}
