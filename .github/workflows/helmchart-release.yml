@@ -104,7 +104,7 @@ jobs:
     - name: Upload Charts 
       run: |
         # upload new charts to repo
-        CHART_TMPDIR="{{ env.CHART_TMPDIR }}"
+        CHART_TMPDIR="${{ env.CHART_TMPDIR }}"
         if [ "$(ls -A "${CHART_TMPDIR}")" ]
         then
            # dir is not empty so there are charts to upload
@@ -161,7 +161,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: broadinstitute/gotc-helm-repo
-        token: {{ env.CR_TOKEN }}
+        token: ${{ env.CR_TOKEN }}
         ref: gh-pages
 
     - name: download index.yaml
