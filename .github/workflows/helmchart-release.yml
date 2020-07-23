@@ -55,72 +55,72 @@ jobs:
         # add token to cr.yaml file
         echo "token: ${CR_TOKEN}" >> helm/cr.yaml
 
-      - name: Create Chart list from changed files
-        run: |
-           # process list of changed files
-           changed_files=$(echo "${{ steps.changed-files.outputs.all }}" | tr -d '[|]' | sed -e 's;,; ;g')
-           chartlist=()
-           # for each file see if it part of a helm chart
-           for file in ${changed_files}
-           do
-              if echo $file | grep -qE "^helm/"
-              then
-                 # file under helm directory get subdir name
-                 subdir=$(echo $file | cut -d '/' -f2)
-                 # ignore certain files
-                 if [[ "${subdir}" != "ct.yaml" && "${subdir}" != "cr.yaml.ctmpl" ]]
-                 then
-                    # check if we seen this subdir before
-                    if [[ ! " ${chartlist[@]} " =~ " ${subdir} " ]]
-                    then
-                        # add to changed chart list
-                        chartlist+=( "${subdir}" )
-                    fi
-                 fi
-             fi
-           done
-           # write to file
-           echo "${chartlist[@]}" > changed-charts.txt
-
-#      - name: archive changed chart list
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: changed-charts
-#          path: changed-charts.txt
-
-      - name: Create Chart packages
-        run: |
-          # mkdir whwere chart packages will be stored
-          CHART_TMPDIR=$(mktemp -d charts.XXXXXX)
-          echo ::set-env name=CHART_TMPDIR::${CHART_TMPDIR}
-          # for each updated chart create package
-          for chart in $(cat changed-charts.txt)
-          do
-            echo "Creating package for chart: (${chart})..."
-            # use helm to create package
-            helm package helm/${chart} --destination ${CHART_TMPDIR}
-          done
-
-      - name: Upload Charts 
-        run: |
-          # upload new charts to repo
-          CHART_TMPDIR="{{ env.CHART_TMPDIR }}"
-          if [ "$(ls -A "${CHART_TMPDIR}")" ]
-          then
-             # dir is not empty so there are charts to upload
-             docker run --rm -v ${PWD}/helm/cr.yaml:/cr.yaml -v ${PWD}/${CHART_TMPDIR}:/deploy  quay.io/helmpack/chart-releaser:v0.2.3 cr upload --package-path /deploy --config /cr.yaml
+    - name: Create Chart list from changed files
+      run: |
+         # process list of changed files
+         changed_files=$(echo "${{ steps.changed-files.outputs.all }}" | tr -d '[|]' | sed -e 's;,; ;g')
+         chartlist=()
+         # for each file see if it part of a helm chart
+         for file in ${changed_files}
+         do
+            if echo $file | grep -qE "^helm/"
+            then
+               # file under helm directory get subdir name
+               subdir=$(echo $file | cut -d '/' -f2)
+               # ignore certain files
+               if [[ "${subdir}" != "ct.yaml" && "${subdir}" != "cr.yaml.ctmpl" ]]
+               then
+                  # check if we seen this subdir before
+                  if [[ ! " ${chartlist[@]} " =~ " ${subdir} " ]]
+                  then
+                      # add to changed chart list
+                      chartlist+=( "${subdir}" )
+                  fi
+               fi
            fi
+         done
+         # write to file
+         echo "${chartlist[@]}" > changed-charts.txt
 
-           # create a new index.yaml for chart repo
-           # NOTE: even if there are no chart packages the following command will create 
-           #  an index.yaml.  It will just what is currently at the helm repo
-           docker run --rm  -v ${PWD}/helm/cr.yaml:/cr.yaml -v ${PWD}/${CHART_TMPDIR}:/deploy -v ${PWD}/${CHART_TMPDIR}:/index quay.io/helmpack/chart-releaser:v0.2.3 cr index --package-path /deploy --index-path /index/index.yaml --config /cr.yaml
+    - name: archive changed chart list
+      uses: actions/upload-artifact@v2
+      with:
+        name: changed-charts
+        path: changed-charts.txt
+
+    - name: Create Chart packages
+      run: |
+        # mkdir whwere chart packages will be stored
+        CHART_TMPDIR=$(mktemp -d charts.XXXXXX)
+        echo ::set-env name=CHART_TMPDIR::${CHART_TMPDIR}
+        # for each updated chart create package
+        for chart in $(cat changed-charts.txt)
+        do
+          echo "Creating package for chart: (${chart})..."
+          # use helm to create package
+          helm package helm/${chart} --destination ${CHART_TMPDIR}
+        done
+
+    - name: Upload Charts 
+      run: |
+        # upload new charts to repo
+        CHART_TMPDIR="{{ env.CHART_TMPDIR }}"
+        if [ "$(ls -A "${CHART_TMPDIR}")" ]
+        then
+           # dir is not empty so there are charts to upload
+           docker run --rm -v ${PWD}/helm/cr.yaml:/cr.yaml -v ${PWD}/${CHART_TMPDIR}:/deploy  quay.io/helmpack/chart-releaser:v0.2.3 cr upload --package-path /deploy --config /cr.yaml
+         fi
+
+         # create a new index.yaml for chart repo
+         # NOTE: even if there are no chart packages the following command will create 
+         #  an index.yaml.  It will just what is currently at the helm repo
+         docker run --rm  -v ${PWD}/helm/cr.yaml:/cr.yaml -v ${PWD}/${CHART_TMPDIR}:/deploy -v ${PWD}/${CHART_TMPDIR}:/index quay.io/helmpack/chart-releaser:v0.2.3 cr index --package-path /deploy --index-path /index/index.yaml --config /cr.yaml
           
-      - name: archive changed chart list
-        uses: actions/upload-artifact@v2
-        with:
-          name: chart-index
-          path: ${CHART_TMPDIR}/index.yaml
+    - name: archive changed chart list
+      uses: actions/upload-artifact@v2
+      with:
+        name: chart-index
+        path: ${CHART_TMPDIR}/index.yaml
     
   update-helm-repo:
     runs-on: ubuntu-latest
@@ -164,16 +164,16 @@ jobs:
         token: {{ env.CR_TOKEN }}
         ref: gh-pages
 
-      - name: download index.yaml
-        uses: actions/download-artifact@v2
-        with:
-          name: chart-index
+    - name: download index.yaml
+      uses: actions/download-artifact@v2
+      with:
+        name: chart-index
 
-      - name: Git update
-        run: |
-          # git add index.yaml
-          # git commit -m "release charts" 
-          # git push origin gh-pages
-          git status
-          ls -al
+    - name: Git update
+      run: |
+        # git add index.yaml
+        # git commit -m "release charts" 
+        # git push origin gh-pages
+        git status
+        ls -al
           
