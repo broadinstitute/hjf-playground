@@ -13,14 +13,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-#      with:
-#        persist-credentials: false
-#        fetch-depth: '2'
-
-#    - name: Configure Git
-#      run: |
-#        git config user.name "$GITHUB_ACTOR"
-#        git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
     # Get secret from vault
     - name: RetrieveToken
@@ -87,6 +79,7 @@ jobs:
          done
          # write to file
          echo "${chartlist[@]}" > changed-charts.txt
+         echo "The following charts have updates:"
          cat changed-charts.txt
 
     - name: archive changed chart list
@@ -128,7 +121,7 @@ jobs:
          #  an index.yaml.  It will just what is currently at the helm repo
          docker run --rm  -v ${PWD}/helm/cr.yaml:/cr.yaml -v ${PWD}/${CHART_TMPDIR}:/deploy -v ${PWD}/${INDEX_TMPDIR}:/index quay.io/helmpack/chart-releaser:v0.2.3 cr index --package-path /deploy --index-path /index/index.yaml --config /cr.yaml
           
-    - name: archive changed chart list
+    - name: archive new index.yaml
       uses: actions/upload-artifact@v2
       with:
         name: chart-index
@@ -182,11 +175,23 @@ jobs:
       with:
         name: chart-index
 
+    - name: download changed chart list
+      uses: actions/download-artifact@v2
+      with:
+        name: changed-charts
+
     - name: Git update
       run: |
-        # git add index.yaml
-        # git commit -m "release charts" 
-        # git push origin gh-pages
-        git status
-        ls -al
+        # create commit message based on changed chart list
+        COMMIT_MSG="Release charts: "
+        for chart in $(cat changed-charts.txt)
+        do
+            COMMIT_MSG="${COMMIT_MSG} ${chart}, " 
+        done
+        # add updated index.yaml
+        git add index.yaml
+        # commit changes
+        git commit -m "${COMMIT_MSG}" 
+        # push changes
+        git push origin gh-pages
           
