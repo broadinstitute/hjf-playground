@@ -124,6 +124,7 @@ jobs:
     
   update-helm-repo:
     runs-on: ubuntu-latest
+    needs: package-charts
     steps:
 
     # Get secret from vault
