@@ -180,18 +180,22 @@ jobs:
       with:
         name: changed-charts
 
+    - name: Configure Git
+      run: |
+        git config user.name "$GITHUB_ACTOR"
+        git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
     - name: Git update
       run: |
         # create commit message based on changed chart list
-        COMMIT_MSG="Release charts: "
-        for chart in $(cat changed-charts.txt)
-        do
-            COMMIT_MSG="${COMMIT_MSG} ${chart}, " 
-        done
+        COMMIT_MSG="Release charts: $(cat changed-charts.txt)"
+        # for chart in $(cat changed-charts.txt)
+        # do
+        #     COMMIT_MSG="${COMMIT_MSG} ${chart}, " 
+        # done
         # add updated index.yaml
         git add index.yaml
         # commit changes
         git commit -m "${COMMIT_MSG}" 
         # push changes
         git push origin gh-pages
-          
