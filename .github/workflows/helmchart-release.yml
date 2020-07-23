@@ -53,9 +53,13 @@ jobs:
         echo ::add-mask::${CR_TOKEN}
         echo ::set-env name=CR_TOKEN::${CR_TOKEN}
         # add token to cr.yaml file
-        ls -al helm
         echo "token: ${CR_TOKEN}" >> helm/cr.yaml
-        ls -al helm
+
+    - name: Get changed files
+      id: changed-files
+      uses: lots0logs/gh-action-get-changed-files@2.1.4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create Chart list from changed files
       run: |
@@ -97,7 +101,6 @@ jobs:
         CHART_TMPDIR=$(mktemp -d charts.XXXXXX)
         echo ::set-env name=CHART_TMPDIR::${CHART_TMPDIR}
         #
-        ls -al 
         cat changed-charts.txt
         # for each updated chart create package
         for chart in $(cat changed-charts.txt)
@@ -111,8 +114,9 @@ jobs:
       run: |
         # upload new charts to repo
         CHART_TMPDIR="${{ env.CHART_TMPDIR }}"
-        # 
-        ls -al helm
+        # need a tmp dir for new index.yaml
+        INDEX_TMPDIR=$(mktemp -d index.XXXXXX)
+        echo ::set-env name=INDEX_TMPDIR::${INDEX_TMPDIR}
         if [ "$(ls -A "${CHART_TMPDIR}")" ]
         then
            # dir is not empty so there are charts to upload
@@ -122,13 +126,13 @@ jobs:
          # create a new index.yaml for chart repo
          # NOTE: even if there are no chart packages the following command will create 
          #  an index.yaml.  It will just what is currently at the helm repo
-         docker run --rm  -v ${PWD}/helm/cr.yaml:/cr.yaml -v ${PWD}/${CHART_TMPDIR}:/deploy -v ${PWD}/${CHART_TMPDIR}:/index quay.io/helmpack/chart-releaser:v0.2.3 cr index --package-path /deploy --index-path /index/index.yaml --config /cr.yaml
+         docker run --rm  -v ${PWD}/helm/cr.yaml:/cr.yaml -v ${PWD}/${CHART_TMPDIR}:/deploy -v ${PWD}/${INDEX_TMPDIR}:/index quay.io/helmpack/chart-releaser:v0.2.3 cr index --package-path /deploy --index-path /index/index.yaml --config /cr.yaml
           
     - name: archive changed chart list
       uses: actions/upload-artifact@v2
       with:
         name: chart-index
-        path: ${CHART_TMPDIR}/index.yaml
+        path: ${{ env.INDEX_TMPDIR }}/index.yaml
     
   update-helm-repo:
     runs-on: ubuntu-latest
