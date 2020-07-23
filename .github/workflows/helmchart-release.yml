@@ -53,7 +53,9 @@ jobs:
         echo ::add-mask::${CR_TOKEN}
         echo ::set-env name=CR_TOKEN::${CR_TOKEN}
         # add token to cr.yaml file
+        ls -al helm
         echo "token: ${CR_TOKEN}" >> helm/cr.yaml
+        ls -al helm
 
     - name: Create Chart list from changed files
       run: |
@@ -81,6 +83,7 @@ jobs:
          done
          # write to file
          echo "${chartlist[@]}" > changed-charts.txt
+         cat changed-charts.txt
 
     - name: archive changed chart list
       uses: actions/upload-artifact@v2
@@ -93,6 +96,9 @@ jobs:
         # mkdir whwere chart packages will be stored
         CHART_TMPDIR=$(mktemp -d charts.XXXXXX)
         echo ::set-env name=CHART_TMPDIR::${CHART_TMPDIR}
+        #
+        ls -al 
+        cat changed-charts.txt
         # for each updated chart create package
         for chart in $(cat changed-charts.txt)
         do
@@ -105,6 +111,8 @@ jobs:
       run: |
         # upload new charts to repo
         CHART_TMPDIR="${{ env.CHART_TMPDIR }}"
+        # 
+        ls -al helm
         if [ "$(ls -A "${CHART_TMPDIR}")" ]
         then
            # dir is not empty so there are charts to upload
