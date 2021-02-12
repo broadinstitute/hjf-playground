@@ -1,0 +1,54 @@
+name: 'Terraform Deploy Test - gotc-monitoring'
+env:
+  terraform_directory: "deploy/gotc-monitoring/terraform"
+  terraform_version: "0.14.5"
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - deploy/gotc-monitoring/terraform/**
+
+jobs:
+  terraform_plan:
+    name: "Terraform Plan"
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v2
+
+    - name: "Fetch Creds from Vault"
+      env:
+        ROLE_ID: ${{ secrets.ROLE_ID }}
+        SECRET_ID: ${{ secrets.SECRET_ID }}
+        VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+      run: |
+        # get vault token using role-id and secret-id
+        VAULT_TOKEN=$(curl \
+            --request POST \
+            --data "{\"role_id\":\"${ROLE_ID}\",\"secret_id\":\"${SECRET_ID}\"}" \
+            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
+        if [ -z "${VAULT_TOKEN}" ] ; then
+           echo "Vault authentication failed!"
+           exit 1
+        fi
+        echo ::add-mask::${VAULT_TOKEN}
+        echo "VAULT_TOKEN=${VAULT_TOKEN}" >> $GITHUB_ENV
+        # use vault token to read secret - service account json
+        curl --silent -H "X-Vault-Token: ${VAULT_TOKEN}" -X GET \
+             ${VAULT_ADDR}/v1/secret/dsde/gotc/dev/ci/ci-non-prod-service-account.json \
+             | jq .data > sa.json
+        if [ ! -s sa.json ] ; then
+           echo "Retrieval of Gcloud SA credentials failed"
+           exit 1
+        fi
+
+    - name: "Setup GCloud SDK"
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        service_account_key: $(cat sa.json)
+        export_default_credentials: true
+
+    - name: "gcloud verify"
+      run: gcloud info 
+
