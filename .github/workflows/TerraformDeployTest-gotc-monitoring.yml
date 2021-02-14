@@ -23,6 +23,7 @@ jobs:
         SECRET_ID: ${{ secrets.SECRET_ID }}
         VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
       run: |
+        set -x
         # get vault token using role-id and secret-id
         VAULT_TOKEN=$(curl \
             --request POST \
@@ -42,6 +43,7 @@ jobs:
            echo "Retrieval of Gcloud SA credentials failed"
            exit 1
         fi
+        ls -al sa.json
         # auth as service account
         gcloud auth activate-service-account --key-file=sa.json
         if [ $? -ne 0 ] ; then
