@@ -13,11 +13,15 @@ jobs:
   terraform_plan:
     name: "Terraform Plan"
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.terraform_directory }}
+
     steps:
     - name: "Checkout"
       uses: actions/checkout@v2
 
-    - name: "Fetch Creds from Vault"
+    - name: "Fetch Creds from Vault - gcloud auth"
       env:
         ROLE_ID: ${{ secrets.ROLE_ID }}
         SECRET_ID: ${{ secrets.SECRET_ID }}
@@ -42,13 +46,40 @@ jobs:
            echo "Retrieval of Gcloud SA credentials failed"
            exit 1
         fi
+        ls -al sa.json
+        # auth as service account
+        gcloud auth activate-service-account --key-file=sa.json
+        if [ $? -ne 0 ] ; then
+           echo "Gcloud auth failed!"
+           exit 1
+        fi
+        # get bearer token and set it to a specific env var that
+        #   subsequent steps expect.  bearer token good for 1 hour
+        GOOGLE_OAUTH_ACCESS_TOKEN=$(gcloud auth print-access-token)
+        if [ -z "${GOOGLE_OAUTH_ACCESS_TOKEN}" ] ; then
+           echo "Generating Gcloud access token failed"
+           exit 1
+        fi
+        echo ::add-mask::${GOOGLE_OAUTH_ACCESS_TOKEN}
+        echo "GOOGLE_OAUTH_ACCESS_TOKEN=${GOOGLE_OAUTH_ACCESS_TOKEN}" >> $GITHUB_ENV
 
-    - name: "Setup GCloud SDK"
-      uses: google-github-actions/setup-gcloud@master
+    - name: "Setup Terraform environment"
+      uses: hashicorp/setup-terraform@v1.2.1
       with:
-        service_account_key: ${{ cat sa.json }}
-        export_default_credentials: true
+          terraform_version: ${{ env.terraform_version }}
 
-    - name: "gcloud verify"
-      run: gcloud info 
+    - name: "Terraform fmt"
+      run: terraform fmt -check -no-color
+      continue-on-error: true
 
+    - name: "Terraform init"
+      run: terraform init
+
+    - name: "Terraform validate"
+      run: terraform validate -no-color
+      continue-on-error: true
+
+    - name: "Terraform plan"
+      id: plan
+      run: TF_LOG=DEBUG; terraform plan -input=false -no-color
+      
