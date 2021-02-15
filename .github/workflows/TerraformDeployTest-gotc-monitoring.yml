@@ -27,7 +27,6 @@ jobs:
         SECRET_ID: ${{ secrets.SECRET_ID }}
         VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
       run: |
-        set -x
         # get vault token using role-id and secret-id
         VAULT_TOKEN=$(curl \
             --request POST \
@@ -82,6 +81,5 @@ jobs:
 
     - name: "Terraform plan"
       id: plan
-      run: TF_LOG=DEBUG; terraform plan -input=flase -no-color
-#      continue-on-error: true
+      run: TF_LOG=DEBUG; terraform plan -input=false -no-color
       
