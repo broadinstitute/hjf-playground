@@ -83,5 +83,5 @@ jobs:
     - name: "Terraform plan"
       id: plan
       run: TF_LOG=DEBUG; terraform plan -input=flase -no-color
-      continue-on-error: true
+#      continue-on-error: true
       
