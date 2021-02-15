@@ -13,6 +13,10 @@ jobs:
   terraform_plan:
     name: "Terraform Plan"
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.terraform_directory }}
+
     steps:
     - name: "Checkout"
       uses: actions/checkout@v2
@@ -66,5 +70,18 @@ jobs:
           terraform_version: ${{ env.terraform_version }}
 
     - name: "Terraform fmt"
-      run: |
-         terraform version
+      run: terraform fmt -check -no-color
+      continue-on-error: true
+
+    - name: "Terraform init"
+      run: terraform init
+
+    - name: "Terraform validate"
+      run: terraform validate -no-color
+      continue-on-error: true
+
+    - name: "Terraform plan"
+      id: plan
+      run: TF_LOG=DEBUG; terraform plan -input=flase -no-color
+      continue-on-error: true
+      
