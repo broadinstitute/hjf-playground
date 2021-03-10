@@ -44,6 +44,7 @@ jobs:
           changed=$(ct list-changed --chart-dirs ${{ env.HELM_CHART_DIR }} --target-branch ${{ env.GIT_MAIN_BRANCH }})
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
+            echo "$changed"
           fi
 
       - name: Run chart-testing (lint)
