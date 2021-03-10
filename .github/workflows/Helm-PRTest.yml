@@ -7,6 +7,7 @@ env:
   HELM_VERSION: v3.4.0
   PYTHON_VERSION: 3.7
 
+# run on PRs against main branch for just changes under the charts sub-directory
 on: 
   pull_request:
     branches:
