@@ -10,7 +10,7 @@ env:
   GIT_MAIN_BRANCH: main
 
 on: 
-  merge:
+  push:
     branches:
       - main
     paths:
