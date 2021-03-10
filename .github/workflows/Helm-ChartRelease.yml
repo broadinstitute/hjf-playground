@@ -1,0 +1,56 @@
+---
+name: Helm Chart Release
+
+
+env:
+# set various versions for supporting tools.  Allows all the versions to be configured in 
+#  one place at the top of the action
+  HELM_VERSION: v3.4.0
+  HELM_CHART_DIR: charts
+  GIT_MAIN_BRANCH: main
+
+on: 
+  merge:
+    branches:
+      - main
+    paths:
+      - charts/**
+
+jobs:
+  release_chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: true
+          fetch-depth: 0   # otherwise, you will failed to push refs to dest repo
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.2.0
+        with:
+          charts_dir: ${{ env.HELM_CHART_DIR }} 
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+#      - name: Run chart-testing (list-changed)
+#        id: list-changed
+#        run: |
+#          changed=$(ct list-changed --chart-dirs ${{ env.HELM_CHART_DIR }} --target-branch ${{ env.GIT_MAIN_BRANCH }})
+#          if [[ -n "$changed" ]]; then
+#            echo "::set-output name=changed::true"
+#            echo "The following charts will be linted: $changed"
+#          fi
+#
+#      - name: Run chart-testing (lint)
+#        run: ct lint --chart-dirs ${{ env.HELM_CHART_DIR }} --target-branch ${{ env.GIT_MAIN_BRANCH }}
