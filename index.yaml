@@ -15,4 +15,19 @@ entries:
     urls:
     - https://github.com/broadinstitute/hjf-playground/releases/download/hjf-test-chart-0.1.6/hjf-test-chart-0.1.6.tgz
     version: 0.1.6
-generated: "2021-03-10T18:50:03.980646165Z"
+  hjf-test-chart2:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2021-03-10T19:01:17.729157824Z"
+    description: A Helm chart for Kubernetes
+    digest: ab3fc74ed0fb5823c5b8aa924d433d4795ba9787c030014f401eb42f3e1d4a49
+    home: https://github.com/broadinstitute/hjf-playground
+    maintainers:
+    - email: ferrara@broadinstitute.org
+      name: ferrara
+    name: hjf-test-chart2
+    type: application
+    urls:
+    - https://github.com/broadinstitute/hjf-playground/releases/download/hjf-test-chart2-0.1.1/hjf-test-chart2-0.1.1.tgz
+    version: 0.1.1
+generated: "2021-03-10T19:01:17.729274125Z"
