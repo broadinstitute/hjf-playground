@@ -6,6 +6,8 @@ env:
 #  one place at the top of the action
   HELM_VERSION: v3.4.0
   PYTHON_VERSION: 3.7
+  HELM_CHART_DIR: charts
+  GIT_MAIN_BRANCH: main
 
 # run on PRs against main branch for just changes under the charts sub-directory
 on: 
@@ -39,7 +41,7 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed)
+          changed=$(ct list-changed --chart-dirs ${{ env.HELM_CHART_DIR }} --target-branch ${{ env.GIT_MAIN_BRANCH }})
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
           fi
