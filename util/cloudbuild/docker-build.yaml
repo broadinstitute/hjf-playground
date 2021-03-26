@@ -4,5 +4,5 @@ steps:
     args: [ 'build', '-t', 'test-docker', '.' ]
     dir: util/docker
   - name: 'test-docker'
-    args: [ '/bin/sh', 'echo "build"' ]
+    args: [ 'echo "build"' ]
 
