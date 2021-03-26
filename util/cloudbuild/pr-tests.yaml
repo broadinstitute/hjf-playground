@@ -1,0 +1,8 @@
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', 'test-docker', '.' ]
+    dir: util/docker
+  - name: 'test-docker'
+    args: [ '/bin/bash', 'echo "pr-test"' ]
+
