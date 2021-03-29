@@ -29,7 +29,8 @@ resource "google_cloudbuild_trigger" "util-push-any" {
     name  = "hjf-playground"
     owner = "broadinstitute"
     push {
-      branch = "^[main|develop|staging|prod]"
+      branch       = "[main|develop|staging|prod]"
+      invert_regex = true
 #      branch = "[hf_junk|main|develop|staging|prod]"
     }
   }
