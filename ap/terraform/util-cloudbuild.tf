@@ -29,7 +29,7 @@ resource "google_cloudbuild_trigger" "util-push-any" {
     name  = "hjf-playground"
     owner = "broadinstitute"
     push {
-      branch = "(hf_junk|main|develop|staging|prod)"
+      branch = "[hf_junk|main|develop|staging|prod]"
 #      branch = "hf_junk"
     }
   }
