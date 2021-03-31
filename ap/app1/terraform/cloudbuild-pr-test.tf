@@ -5,6 +5,10 @@ resource "google_cloudbuild_trigger" "app1-terraform-pr-test" {
   name     = "app1-terraform-pr-test"
   tags     = ["app1-terraform-pr-test"]
 
+  substitutions = {
+    "_TOPDIR" = "ap/app1/terraform"
+  }
+
   github {
     name  = "hjf-playground"
     owner = "broadinstitute"
@@ -16,7 +20,7 @@ resource "google_cloudbuild_trigger" "app1-terraform-pr-test" {
 
   included_files = ["ap/app1/terraform/**"]
 
-  excluded_files = ["ap/app1/terraform/cloudbuild-pr-test.yaml", "ap/app1/terraform/.gitignore"]
+  ignored_files = ["ap/app1/terraform/cloudbuild-pr-test.yaml", "ap/app1/terraform/.gitignore"]
 
   filename = "ap/app1/terraform/cloudbuild-pr-test.yaml"
 }
