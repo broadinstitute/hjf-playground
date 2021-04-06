@@ -91,7 +91,7 @@ steps:
         for outputfile in /workspace/step*.txt
         do
           stepname=$(echo "$outputfile" | cut -d '/' -f3 | cut -d '-' -f2 | cut -d '.' -f1)
-          if [ -e "/workspace/rc-${stepname}" ] ; then
+          if [ -e "/workspace/rc-${stepname}.txt" ] ; then
              # step error
              echo "#### Terraform ${stepname} returned non-zero " >> comment.txt
              echo >> comment.txt
