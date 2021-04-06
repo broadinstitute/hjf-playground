@@ -93,7 +93,7 @@ steps:
           stepname=$(echo "$outputfile" | cut -d '/' -f3 | cut -d '-' -f2 | cut -d '.' -f1)
           if [ "${stepname}" = "plan" ]; then
              # plan output is special skip until end
-             next
+             continue
           fi
           if [ -e "/workspace/rc-${stepname}.txt" ] ; then
              # step error
