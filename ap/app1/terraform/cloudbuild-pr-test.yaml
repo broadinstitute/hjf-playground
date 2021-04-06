@@ -91,6 +91,10 @@ steps:
         for outputfile in /workspace/step*.txt
         do
           stepname=$(echo "$outputfile" | cut -d '/' -f3 | cut -d '-' -f2 | cut -d '.' -f1)
+          if [ "${stepname}" = "plan" ]; then
+             # plan output is special skip until end
+             next
+          fi
           if [ -e "/workspace/rc-${stepname}.txt" ] ; then
              # step error
              echo "#### Terraform ${stepname} returned non-zero " >> comment.txt
@@ -101,6 +105,13 @@ steps:
              echo >> comment.txt
           fi 
         done
+        if [ -e "/workspace/rc-plan.txt" ] ; then
+            echo "#### Terraform plan returned non-zero " >> comment.txt
+        else
+            echo "#### Terraform plan PASSED" >> comment.txt
+        fi
+        echo >> comment.txt
+        cat /workspace/step-plan.txt >> comment.txt
         /usr/bin/gh.bash pr review $_PR_NUMBER -R broadinstitute/$REPO_NAME -c -b "$(cat comment.txt)"
 
   - id: job-exit-status
