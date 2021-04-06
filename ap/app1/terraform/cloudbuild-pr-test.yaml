@@ -87,20 +87,21 @@ steps:
     args:
       - -c
       - |
-        read -r -d "" gh_comment_template << EOF
-        <details>
-          <summary>Terraform %s Results</summary>
-          
-          \`\`\`
-          %s
-          \`\`\`
-        </details>
-        EOF
+        > comment.txt
         for outputfile in /workspace/step*.txt
         do
-          gh_comment=$(printf "$$outputfile" "$$gh_comment_template" "$(cat $$outputfile )")
-          /usr/bin/gh.bash pr review $_PR_NUMBER -R broadinstitute/$REPO_NAME -c -b "$$gh_comment"
+          stepname=$(echo "$outputfile" | cut -d '/' -f3 | cut -d '-' -f2 | cut -d '.' -f1)
+          if [ -e "/workspace/rc-${stepname}" ] ; then
+             # step error
+             echo "#### Terraform ${stepname} returned non-zero " >> comment.txt
+             echo >> comment.txt
+             cat /workspace/step-$stepname}.txt >> comment.txt
+          else
+             echo "#### Terraform ${stepname} PASSED " >> comment.txt
+             echo >> comment.txt
+          fi 
         done
+        /usr/bin/gh.bash pr review $_PR_NUMBER -R broadinstitute/$REPO_NAME -c -b "$(cat comment.txt)"
 
   - id: job-exit-status
     name: 'gcr.io/cloud-builders/gcloud'
