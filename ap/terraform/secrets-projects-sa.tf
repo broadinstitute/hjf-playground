@@ -17,7 +17,7 @@ resource "google_secret_manager_secret" "automatic-potato-hjf-ap-service-account
 
 # IAM access for secret
 
-resource "google_secret_manager_secret_iam_member" "member" {
+resource "google_secret_manager_secret_iam_member" "automatic-potato-hjf-ap-service-account-read" {
   provider = google.automatic-potato-hjf
   #  project = google_secret_manager_secret.secret-basic.project
   secret_id = google_secret_manager_secret.automatic-potato-hjf-ap-service-account.secret_id

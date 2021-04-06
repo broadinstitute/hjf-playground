@@ -31,7 +31,7 @@ resource "google_cloudbuild_trigger" "util-push-any" {
     push {
       branch       = "[main|develop|staging|prod]"
       invert_regex = true
-#      branch = "[hf_junk|main|develop|staging|prod]"
+      #      branch = "[hf_junk|main|develop|staging|prod]"
     }
   }
 
