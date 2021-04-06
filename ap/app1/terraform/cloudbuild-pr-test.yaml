@@ -99,7 +99,7 @@ steps:
         for outputfile in /workspace/step*.txt
         do
           gh_comment=$(printf "$$outputfile" "$$gh_comment_template" "$(cat $$outputfile )")
-          /usr/bin/gh.bash pr review $_PR_NUMBER -R $_GITHUB_USER/$REPO_NAME -c -b "$$gh_comment"
+          /usr/bin/gh.bash pr review $_PR_NUMBER -R broadinstitute/$REPO_NAME -c -b "$$gh_comment"
         done
 
   - id: job-exit-status
