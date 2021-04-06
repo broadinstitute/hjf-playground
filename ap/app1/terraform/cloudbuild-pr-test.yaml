@@ -14,6 +14,7 @@ steps:
       - |
         echo $$SA_JSON > sa2.json
         gcloud --project automatic-potato-hjf secrets versions access latest --secret=automatic-potato-hjf-ap-service-account > sa.json
+        gcloud --project automatic-potato-hjf secrets versions access latest --secret=hjfbynara-github-pat > /workspace/token.txt
         gcloud auth activate-service-account --key-file=sa.json
         gcloud auth print-access-token > /workspace/sa.token
 
@@ -74,11 +75,32 @@ steps:
       - -c
       - | 
         export GOOGLE_OAUTH_ACCESS_TOKEN=$(cat /workspace/sa.token)
-        terraform -chdir=/workspace/${_TOPDIR} plan -lock=false > /workspace/step-plan.txt 2>&1 || echo "$?" > /workspace/rc-plan.txt
+        terraform -chdir=/workspace/${_TOPDIR} plan -no-color -lock=false > /workspace/step-plan.txt 2>&1 || echo "$?" > /workspace/rc-plan.txt
         if [ -e /workspace/rc-plan.txt ] ; then
            echo "Plan returned error ..."
            cat /workspace/step-plan.txt
         fi 
+
+  - id: post-test-results
+    name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/cloudbuild-github-cli:latest'
+    entrypoint: "/bin/bash"
+    args:
+      - -c
+      - |
+        read -r -d "" gh_comment_template << EOF
+        <details>
+          <summary>Terraform %s Results</summary>
+          
+          \`\`\`
+          %s
+          \`\`\`
+        </details>
+        EOF
+        for outputfile in /workspace/step*.txt
+        do
+          gh_comment=$(printf "$$outputfile" "$$gh_comment_template" "$(cat $$outputfile )")
+          /usr/bin/gh.bash pr review $_PR_NUMBER -R $_GITHUB_USER/$REPO_NAME -c -b "$$gh_comment"
+        done
 
   - id: job-exit-status
     name: 'gcr.io/cloud-builders/gcloud'
