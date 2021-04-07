@@ -87,10 +87,17 @@ jobs:
 
           *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.terraform_directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
-          github.pulls.createReviewComment({
-            pull_number: context.issue.number,
+          github.issues.createComment({
+            issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
             body: output
           })
+
+#          github.pulls.createReviewComment({
+#            pull_number: context.issue.number,
+#            owner: context.repo.owner,
+#            repo: context.repo.repo,
+#            body: output
+#          })
       
