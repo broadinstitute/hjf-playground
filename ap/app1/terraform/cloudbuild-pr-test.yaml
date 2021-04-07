@@ -88,30 +88,21 @@ steps:
       - -c
       - |
         > comment.txt
-        for outputfile in /workspace/step*.txt
+        for stepname in fmt init validate plan
         do
-          stepname=$(echo "$outputfile" | cut -d '/' -f3 | cut -d '-' -f2 | cut -d '.' -f1)
-          if [ "${stepname}" = "plan" ]; then
-             # plan output is special skip until end
-             continue
-          fi
+          echo -n "#### Terraform ${stepname}: " >> comment.txt
           if [ -e "/workspace/rc-${stepname}.txt" ] ; then
-             # step error
-             echo "#### Terraform ${stepname} returned non-zero " >> comment.txt
+             echo "Failed" >> comment.txt
+             echo  '<details><summary>Show output</summary>' >> comment.txt
              echo >> comment.txt
-             cat /workspace/step-$stepname}.txt >> comment.txt
+             output=$(cat /workspace/step-${stepname}.txt)
+             echo "\`\`\`${output}" >> comment.txt
+             echo "\`\`\`" >> comment.txt
+             echo '</details>' >> comment.txt
           else
-             echo "#### Terraform ${stepname} PASSED " >> comment.txt
-             echo >> comment.txt
+             echo "Successful" >> comment.txt
           fi 
         done
-        if [ -e "/workspace/rc-plan.txt" ] ; then
-            echo "#### Terraform plan returned non-zero " >> comment.txt
-        else
-            echo "#### Terraform plan PASSED" >> comment.txt
-        fi
-        echo >> comment.txt
-        cat /workspace/step-plan.txt >> comment.txt
         /usr/bin/gh.bash pr review $_PR_NUMBER -R broadinstitute/$REPO_NAME -c -b "$(cat comment.txt)"
 
   - id: job-exit-status
