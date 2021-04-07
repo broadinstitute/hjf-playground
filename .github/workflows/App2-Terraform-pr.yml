@@ -68,7 +68,7 @@ jobs:
       continue-on-error: true
 
     - name: Outputs
-      uses: actions/github-script@2.0.1
+      uses: actions/github-script@3.1.1
       env:
         PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
       with:
@@ -88,7 +88,7 @@ jobs:
           *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.terraform_directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
           github.issues.createReviewComment({
-            issue_number: context.issue.number,
+            pull_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
             body: output
