@@ -88,15 +88,15 @@ steps:
       - -c
       - |
         > comment.txt
-        for step in fmt init validate plan
+        for stepname in fmt init validate plan
         do
-          echo -c "#### Terraform ${stepname}: " >> comment.txt
+          echo -n "#### Terraform ${stepname}: " >> comment.txt
           if [ -e "/workspace/rc-${stepname}.txt" ] ; then
              echo "Failed" >> comment.txt
              echo >> comment.txt
              echo  '<details><summary>Show output</summary>' >> comment.txt
-             echo -c '\`\`\`' >> comment.txt
-             cat /workspace/step-$stepname}.txt >> comment.txt
+             echo -n '\`\`\`' >> comment.txt
+             cat /workspace/step-${stepname}.txt >> comment.txt
              echo '\`\`\`' >> comment.txt
              echo '</details>' >> comment.txt
           else
