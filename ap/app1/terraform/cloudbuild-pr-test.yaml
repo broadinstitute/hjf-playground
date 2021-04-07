@@ -94,8 +94,10 @@ steps:
           if [ -e "/workspace/rc-${stepname}.txt" ] ; then
              echo "Failed" >> comment.txt
              echo  '<details><summary>Show output</summary>' >> comment.txt
+             echo >> comment.txt
              output=$(cat /workspace/step-${stepname}.txt)
-             echo "\`\`\`${output}\`\`\`" >> comment.txt
+             echo "\`\`\`${output}" >> comment.txt
+             echo "\`\`\`" >> comment.txt
              echo '</details>' >> comment.txt
           else
              echo "Successful" >> comment.txt
