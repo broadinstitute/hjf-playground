@@ -27,8 +27,6 @@ jobs:
         AP_READONLY_SA: ${{ secrets.AP_READONLY_SA }}
       run: |
         echo "${AP_READONLY_SA}" > sa.json
-        head -3 sa.json
-        tail -3 sa.json
         # auth as service account
         gcloud auth activate-service-account --key-file=sa.json
         if [ $? -ne 0 ] ; then
@@ -53,12 +51,18 @@ jobs:
 
     - name: "Terraform Init"
       id: init
-      run: terraform init 
+      run: terraform init -lock=false
       working-directory: ${{ env.terraform_directory }}
       continue-on-error: true
 
     - name: "Terraform Validate"
       id: validate
       run: terraform validate -no-color
+      working-directory: ${{ env.terraform_directory }}
+      continue-on-error: true
+
+    - name: "Terraform Plan"
+      id: plan
+      run: terraform plan -lock=false -no-color
       working-directory: ${{ env.terraform_directory }}
       continue-on-error: true
