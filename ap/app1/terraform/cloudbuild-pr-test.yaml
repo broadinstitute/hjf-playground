@@ -96,7 +96,7 @@ steps:
              echo  '<details><summary>Show output</summary>' >> comment.txt
              echo >> comment.txt
              output=$(cat /workspace/step-${stepname}.txt)
-             echo "\`\`\` >> comment.txt
+             echo "\`\`\`" >> comment.txt
              echo "${output}" >> comment.txt
              echo "\`\`\`" >> comment.txt
              echo '</details>' >> comment.txt
