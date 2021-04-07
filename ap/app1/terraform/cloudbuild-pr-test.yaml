@@ -95,9 +95,9 @@ steps:
              echo "Failed" >> comment.txt
              echo >> comment.txt
              echo  '<details><summary>Show output</summary>' >> comment.txt
-             echo -n '\`\`\`' >> comment.txt
+             echo -n '```' >> comment.txt
              cat /workspace/step-${stepname}.txt >> comment.txt
-             echo '\`\`\`' >> comment.txt
+             echo '```' >> comment.txt
              echo '</details>' >> comment.txt
           else
              echo "Successful" >> comment.txt
