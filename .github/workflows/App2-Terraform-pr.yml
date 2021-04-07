@@ -1,7 +1,7 @@
 name: 'App2 - Terraform PR Test'
 env:
   terraform_directory: "./ap/app2/terraform"
-  terraform_version: "0.14.5"
+  terraform_version: "0.14.8"
 on:
   pull_request:
     paths:
@@ -51,7 +51,7 @@ jobs:
 
     - name: "Terraform Init"
       id: init
-      run: terraform init -lock=false
+      run: terraform init -no-color -lock=false
       working-directory: ${{ env.terraform_directory }}
       continue-on-error: true
 
