@@ -104,6 +104,16 @@ steps:
           else
              echo "Successful" >> comment.txt
              echo >> comment.txt
+             if [ "$stepname" = "plan" ] ; then
+               echo  '<details><summary>Show output</summary>' >> comment.txt
+               echo >> comment.txt
+               output=$(cat /workspace/step-${stepname}.txt)
+               echo "\`\`\`" >> comment.txt
+               echo "${output}" >> comment.txt
+               echo "\`\`\`" >> comment.txt
+               echo '</details>' >> comment.txt
+               echo >> comment.txt
+             fi
           fi 
         done
         /usr/bin/gh.bash pr review $_PR_NUMBER -R broadinstitute/$REPO_NAME -c -b "$(cat comment.txt)"
