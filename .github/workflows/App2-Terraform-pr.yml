@@ -1,7 +1,7 @@
 name: 'App2 - Terraform PR Test'
 env:
   terraform_directory: "./ap/app2/terraform"
-  terraform_version: "0.14.5"
+  terraform_version: "0.14.8"
 on:
   pull_request:
     paths:
@@ -23,8 +23,10 @@ jobs:
 
     - name: Gcloud auth
       id: gcloud
+      env:
+        AP_READONLY_SA: ${{ secrets.AP_READONLY_SA }}
       run: |
-        echo "${{ secrets.AP_READONLY_SA }}" > sa.json
+        echo "${AP_READONLY_SA}" > sa.json
         # auth as service account
         gcloud auth activate-service-account --key-file=sa.json
         if [ $? -ne 0 ] ; then
@@ -49,7 +51,7 @@ jobs:
 
     - name: "Terraform Init"
       id: init
-      run: terraform init 
+      run: terraform init -no-color -lock=false
       working-directory: ${{ env.terraform_directory }}
       continue-on-error: true
 
@@ -58,3 +60,44 @@ jobs:
       run: terraform validate -no-color
       working-directory: ${{ env.terraform_directory }}
       continue-on-error: true
+
+    - name: "Terraform Plan"
+      id: plan
+      run: terraform plan -lock=false -no-color
+      working-directory: ${{ env.terraform_directory }}
+      continue-on-error: true
+
+    - name: Outputs
+      uses: actions/github-script@v3.1.1
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### Terraform Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
+          #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+          #### Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+          <details><summary>Show Plan</summary>
+
+          \`\`\`${process.env.PLAN}\`\`\`
+
+          </details>
+
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.terraform_directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+
+#          github.pulls.createReviewComment({
+#            pull_number: context.issue.number,
+#            owner: context.repo.owner,
+#            repo: context.repo.repo,
+#            body: output
+#          })
+      
