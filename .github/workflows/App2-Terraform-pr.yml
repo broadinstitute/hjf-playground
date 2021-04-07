@@ -23,8 +23,10 @@ jobs:
 
     - name: Gcloud auth
       id: gcloud
+      env:
+        AP_READONLY_SA: ${{ secrets.AP_READONLY_SA }}
       run: |
-        echo "${{ secrets.AP_READONLY_SA }}" > sa.json
+        echo "${AP_READONLY_SA}" > sa.json
         head -3 sa.json
         tail -3 sa.json
         # auth as service account
