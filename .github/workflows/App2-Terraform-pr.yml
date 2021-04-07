@@ -68,7 +68,7 @@ jobs:
       continue-on-error: true
 
     - name: Outputs
-      uses: actions/github-script@0.9.0
+      uses: actions/github-script@2.0.1
       env:
         PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
       with:
