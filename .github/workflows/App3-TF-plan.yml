@@ -40,7 +40,7 @@ jobs:
         echo ${{ github.run_number }}
         echo ${{ github.event.number }}
         echo ${{ github.repository }}
-        gcloud pubsub subscriptions create ${{ github.job }}-${{ github.event.number}}-${{ github.run_number }} --topic=projects/automatic-potato-hjf/topics/app-test-results --expiration-period=1d
+        gcloud pubsub --project automatic-potato-hjf subscriptions create ${{ github.job }}-${{ github.event.number}}-${{ github.run_number }} --topic=projects/automatic-potato-hjf/topics/app-test-results --expiration-period=1d
 #        gcloud pubsub subscriptions create ${GITHUB_REPOSITORY}-${GITHUB_JOB}-${{ github.event.number}}-${GITHUB_RUN_NUMBER}} --topic=projects/automatic-potato-hjf/topics/app-test-results --message-filter= --expiration-period=1h
 
 #    - name: Outputs
