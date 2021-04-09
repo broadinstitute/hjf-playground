@@ -1,0 +1,70 @@
+name: 'App3 - Terraform Plan Test'
+env:
+  terraform_directory: "./ap/app3/terraform"
+  terraform_version: "0.14.8"
+on:
+  pull_request:
+    paths:
+      - 'ap/app3/terraform/**'
+jobs:
+  app2-tests:
+    timeout-minutes: 30
+    if: "!contains( github.event.pull_request.labels.*.name, 'skip-tests')"
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v2
+
+    - name: install terraform
+      uses: hashicorp/setup-terraform@v1.2.1
+      with:
+        terraform_version: ${{ env.terraform_version }}
+
+    - name: Gcloud auth
+      id: gcloud
+      env:
+        AP_READONLY_SA: ${{ secrets.AP_READONLY_SA }}
+      run: |
+        echo "${AP_READONLY_SA}" > sa.json
+        # auth as service account
+        gcloud auth activate-service-account --key-file=sa.json
+        if [ $? -ne 0 ] ; then
+           echo "Gcloud auth failed!"
+           exit 1
+        fi
+
+    - name: "Pub/Sub setup"
+      id: pubsub-setup
+      run: | 
+        echo ${{ github.run_id }}
+        echo ${{ github.run_number }}
+        echo ${{ github.job }}
+#        gcloud pubsub subscriptions create --topic=projects/automatic-potato-hjf/topics/app-test-results --message-filter= --expiration-period=1h
+
+#    - name: Outputs
+#      uses: actions/github-script@v3.1.1
+#      env:
+#        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+#      with:
+#        github-token: ${{ secrets.GITHUB_TOKEN }}
+#        script: |
+#          const output = `#### Terraform Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
+#          #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+#          #### Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
+#          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+#
+#          <details><summary>Show Plan</summary>
+#
+#          \`\`\`${process.env.PLAN}\`\`\`
+#
+#          </details>
+#
+#          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.terraform_directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
+#
+#          github.issues.createComment({
+#            issue_number: context.issue.number,
+#            owner: context.repo.owner,
+#            repo: context.repo.repo,
+#            body: output
+#          })
+
