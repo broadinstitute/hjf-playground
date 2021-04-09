@@ -39,7 +39,9 @@ jobs:
         echo ${{ github.run_id }}
         echo ${{ github.run_number }}
         echo ${{ github.event.number }}
-#        gcloud pubsub subscriptions create --topic=projects/automatic-potato-hjf/topics/app-test-results --message-filter= --expiration-period=1h
+        echo ${{ github.repository }}
+        gcloud pubsub subscriptions create ${GITHUB_REPOSITORY}-${GITHUB_JOB}-${{ github.event.number}}-${GITHUB_RUN_NUMBER}} --topic=projects/automatic-potato-hjf/topics/app-test-results --message-filter= --expiration-period=1h
+#        gcloud pubsub subscriptions create ${GITHUB_REPOSITORY}-${GITHUB_JOB}-${{ github.event.number}}-${GITHUB_RUN_NUMBER}} --topic=projects/automatic-potato-hjf/topics/app-test-results --message-filter= --expiration-period=1h
 
 #    - name: Outputs
 #      uses: actions/github-script@v3.1.1
