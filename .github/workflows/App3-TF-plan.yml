@@ -38,7 +38,7 @@ jobs:
       run: | 
         echo ${{ github.run_id }}
         echo ${{ github.run_number }}
-        echo ${{ github.job }}
+        echo ${{ github.event.number }}
 #        gcloud pubsub subscriptions create --topic=projects/automatic-potato-hjf/topics/app-test-results --message-filter= --expiration-period=1h
 
 #    - name: Outputs
