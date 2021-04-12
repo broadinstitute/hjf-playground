@@ -43,6 +43,11 @@ jobs:
         gcloud pubsub --project automatic-potato-hjf subscriptions create ${{ github.job }}-${{ github.event.number}}-${{ github.run_number }} --topic=projects/automatic-potato-hjf/topics/app-test-results --expiration-period=1d
 #        gcloud pubsub subscriptions create ${GITHUB_REPOSITORY}-${GITHUB_JOB}-${{ github.event.number}}-${GITHUB_RUN_NUMBER}} --topic=projects/automatic-potato-hjf/topics/app-test-results --message-filter= --expiration-period=1h
 
+    - name: "Pub/Sub setup"
+      id: pubsub-post
+      run: | 
+        gcloud pubsub --project automatic-potato-hjf topics publish projects/automatic-potato-hjf/topics/app-test-run --attribute="id=${GITHUB_REPOSITORY}-${GITHUB_JOB}-${{ github.event.number}}-${GITHUB_RUN_NUMBER}}" --message='{"app"="app3","test"="tf_validate","id"="${GITHUB_REPOSITORY}-${GITHUB_JOB}-${{ github.event.number}}-${GITHUB_RUN_NUMBER}}"}' 
+
 #    - name: Outputs
 #      uses: actions/github-script@v3.1.1
 #      env:
