@@ -46,7 +46,7 @@ jobs:
     - name: "Pub/Sub post"
       id: pubsub-post
       run: | 
-        gcloud pubsub --project automatic-potato-hjf topics publish projects/automatic-potato-hjf/topics/app-test-run --attribute="id=${{ github.job }}-${{ github.event.number}}-${{ github.run_number }}" --message='{"app"="app3","test"="tf_validate","branch"="${{ github.base_ref }}","id"="${{ github.job }}-${{ github.event.number}}-${{ github.run_number }}"}' 
+        gcloud pubsub --project automatic-potato-hjf topics publish projects/automatic-potato-hjf/topics/app-test-run --attribute="id=${{ github.job }}-${{ github.event.number}}-${{ github.run_number }}" --message='{"app":"app3","test":"tf_validate","branch":"${{ github.head_ref }}","id":"${{ github.job }}-${{ github.event.number}}-${{ github.run_number }}"}' 
 
 
 #    - name: Outputs
