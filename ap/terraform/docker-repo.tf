@@ -3,7 +3,7 @@ resource "google_artifact_registry_repository" "hjf-docker-public" {
   provider = google-beta.automatic-potato-hjf
 
   #  location = "us-central1"
-  location      = "US"
+  location      = "us"
   repository_id = "hjf-docker-public"
   description   = "HJF Docker public repo"
   format        = "DOCKER"
@@ -27,7 +27,7 @@ resource "google_artifact_registry_repository_iam_binding" "hjf-docker-public-re
   repository = google_artifact_registry_repository.hjf-docker-public.name
   role       = "roles/artifactregistry.repoAdmin"
   members = [
-    "group:devunll@broadinstitute.org",
+    "group:devnull@broadinstitute.org",
     "serviceAccount:${data.google_project.automatic-potato-hjf.number}@cloudbuild.gserviceaccount.com",
   ]
 }
@@ -36,7 +36,7 @@ resource "google_artifact_registry_repository" "hjf-docker-private" {
   provider = google-beta.automatic-potato-hjf
 
   #  location = "us-central1"
-  location      = "US"
+  location      = "us"
   repository_id = "hjf-docker-private"
   description   = "HJF Docker public repo"
   format        = "DOCKER"
@@ -60,7 +60,7 @@ resource "google_artifact_registry_repository_iam_binding" "hjf-docker-private-r
   repository = google_artifact_registry_repository.hjf-docker-private.name
   role       = "roles/artifactregistry.repoAdmin"
   members = [
-    "group:devunll@broadinstitute.org",
+    "group:devnull@broadinstitute.org",
     "serviceAccount:${data.google_project.automatic-potato-hjf.number}@cloudbuild.gserviceaccount.com",
   ]
 }
