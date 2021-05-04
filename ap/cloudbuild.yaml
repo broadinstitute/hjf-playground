@@ -21,7 +21,7 @@ steps:
         echo "export TF_VAR_state_bucket=${PROJECT_ID}-terraform-state" >> /workspace/env.sh
         echo "export TF_VAR_project_id=${PROJECT_ID}" >> /workspace/env.sh
         echo "export TF_VAR_dns_zone=hjf.broadapps.org" >> /workspace/env.sh
-        ls -al ${BUILDER_OUTPUT}
+        echo $$TF_DIR
 
   - id: terraform-version
     name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
@@ -29,7 +29,7 @@ steps:
     args: 
       - -c
       - | 
-        terraform -chdir=/workspace/${_TFDIR} version > /workspace/step-version.txt 2>&1 || echo "$?" > /workspace/rc-version.txt
+        terraform -chdir=/workspace/$${_TFDIR} version > /workspace/step-version.txt 2>&1 || echo "$?" > /workspace/rc-version.txt
         if [ -e /workspace/rc-version.txt ] ; then
            echo "Version returned error ..."
            cat /workspace/step-version.txt
@@ -41,7 +41,7 @@ steps:
     args: 
       - -c 
       - |
-        terraform -chdir=/workspace/${_TFDIR}  fmt -check -recursive > /workspace/step-fmt.txt 2>&1 || echo "$?" > /workspace/rc-fmt.txt
+        terraform -chdir=/workspace/$${_TFDIR}  fmt -check -recursive > /workspace/step-fmt.txt 2>&1 || echo "$?" > /workspace/rc-fmt.txt
         if [ -e /workspace/rc-fmt.txt ] ; then
            echo "Fmt returned error ..."
            cat /workspace/step-fmt.txt
