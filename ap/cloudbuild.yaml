@@ -1,0 +1,89 @@
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/${PROJECT_ID}/secrets/${PROJECT_ID}-ap-service-account/versions/latest
+    env: SA_JSON
+
+steps:
+  - id: setup-env
+    name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
+    secretEnv: [ 'SA_JSON' ]
+    entrypoint: "/bin/bash"
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - '-c' 
+      - |-
+        echo $$SA_JSON > sa2.json
+        gcloud --project automatic-potato-hjf secrets versions access latest --secret=automatic-potato-hjf-ap-service-account > sa.json
+        ls -al sa.json sa2.json
+        gcloud auth activate-service-account --key-file=sa.json
+        gcloud auth print-access-token > /workspace/sa.token
+        env
+        echo "export TF_VAR_state_bucket=${PROJECT_ID}-terraform-state" >> /workspace/env.sh
+        echo "export TF_VAR_project_id=${PROJECT_ID}" >> /workspace/env.sh
+        echo "export TF_VAR_dns_zone=hjf.broadapps.org" >> /workspace/env.sh
+        cat /workspace/env.sh
+
+  - id: terraform-version
+    name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
+    entrypoint: "/bin/bash"
+    args: 
+      - -c
+      - | 
+        terraform -chdir=/workspace/${_TFDIR} version > /workspace/step-version.txt 2>&1 || echo "$?" > /workspace/rc-version.txt
+        if [ -e /workspace/rc-version.txt ] ; then
+           echo "Version returned error ..."
+           cat /workspace/step-version.txt
+        fi 
+
+  - id: terraform-fmt
+    name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
+    entrypoint: "/bin/bash"
+    args: 
+      - -c 
+      - |
+        terraform -chdir=/workspace/${_TFDIR}  fmt -check -recursive > /workspace/step-fmt.txt 2>&1 || echo "$?" > /workspace/rc-fmt.txt
+        if [ -e /workspace/rc-fmt.txt ] ; then
+           echo "Fmt returned error ..."
+           cat /workspace/step-fmt.txt
+        fi 
+
+#  - id: terraform-init
+#    name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
+#    entrypoint: "/bin/bash"
+#    args: 
+#      - -c
+#      - | 
+#        export GOOGLE_OAUTH_ACCESS_TOKEN=$(cat /workspace/sa.token)
+#        terraform -chdir=/workspace/${_TFDIR} init > /workspace/step-init.txt 2>&1 || echo "$?" > /workspace/rc-init.txt
+#        if [ -e /workspace/rc-init.txt ] ; then
+#           echo "Init returned error ..."
+#           cat /workspace/step-init.txt
+#        fi 
+#
+#  - id: terraform-validate
+#    name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
+#    entrypoint: "/bin/bash"
+#    args: 
+#      - -c
+#      - | 
+#        export GOOGLE_OAUTH_ACCESS_TOKEN=$(cat /workspace/sa.token)
+#        terraform -chdir=/workspace/${_TFDIR} validate > /workspace/step-validate.txt 2>&1 || echo "$?" > /workspace/rc-validate.txt
+#        if [ -e /workspace/rc-validate.txt ] ; then
+#           echo "Validate returned error ..."
+#           cat /workspace/step-validate.txt
+#        fi 
+#
+#  - id: terraform-plan
+#    name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
+#    entrypoint: "/bin/bash"
+#    args: 
+#      - -c
+#      - | 
+#        export GOOGLE_OAUTH_ACCESS_TOKEN=$(cat /workspace/sa.token)
+#        terraform -chdir=/workspace/${_TFDIR} plan -no-color -lock=false > /workspace/step-plan.txt 2>&1 || echo "$?" > /workspace/rc-plan.txt
+#        if [ -e /workspace/rc-plan.txt ] ; then
+#           echo "Plan returned error ..."
+#           cat /workspace/step-plan.txt
+#        fi 
