@@ -26,11 +26,11 @@ steps:
     name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
     entrypoint: "/bin/bash"
     env:
-      - TF_DIR=${TF_DIR}
+      - TF_DIR=${_TF_DIR}
     args: 
       - -c
       - | 
-        terraform -chdir=/workspace/$${TF_DIR} version > /workspace/step-version.txt 2>&1 || echo "$?" > /workspace/rc-version.txt
+        terraform -chdir=/workspace/${TF_DIR} version > /workspace/step-version.txt 2>&1 || echo "$?" > /workspace/rc-version.txt
         if [ -e /workspace/rc-version.txt ] ; then
            echo "Version returned error ..."
            cat /workspace/step-version.txt
@@ -40,11 +40,11 @@ steps:
     name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
     entrypoint: "/bin/bash"
     env:
-      - TF_DIR=${TF_DIR}
+      - TF_DIR=${_TF_DIR}
     args: 
       - -c 
       - |
-        terraform -chdir=/workspace/$${TF_DIR}  fmt -check -recursive > /workspace/step-fmt.txt 2>&1 || echo "$?" > /workspace/rc-fmt.txt
+        terraform -chdir=/workspace/${TF_DIR}  fmt -check -recursive > /workspace/step-fmt.txt 2>&1 || echo "$?" > /workspace/rc-fmt.txt
         if [ -e /workspace/rc-fmt.txt ] ; then
            echo "Fmt returned error ..."
            cat /workspace/step-fmt.txt
