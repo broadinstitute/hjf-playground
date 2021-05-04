@@ -16,14 +16,12 @@ steps:
       - |-
         echo $$SA_JSON > sa2.json
         gcloud --project automatic-potato-hjf secrets versions access latest --secret=automatic-potato-hjf-ap-service-account > sa.json
-        ls -al sa.json sa2.json
         gcloud auth activate-service-account --key-file=sa.json
         gcloud auth print-access-token > /workspace/sa.token
-        env
         echo "export TF_VAR_state_bucket=${PROJECT_ID}-terraform-state" >> /workspace/env.sh
         echo "export TF_VAR_project_id=${PROJECT_ID}" >> /workspace/env.sh
         echo "export TF_VAR_dns_zone=hjf.broadapps.org" >> /workspace/env.sh
-        cat /workspace/env.sh
+        ls -al ${BUILDER_OUTPUT}
 
   - id: terraform-version
     name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
