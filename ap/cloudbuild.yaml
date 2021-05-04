@@ -21,13 +21,12 @@ steps:
         echo "export TF_VAR_state_bucket=${PROJECT_ID}-terraform-state" >> /workspace/env.sh
         echo "export TF_VAR_project_id=${PROJECT_ID}" >> /workspace/env.sh
         echo "export TF_VAR_dns_zone=hjf.broadapps.org" >> /workspace/env.sh
-        echo $${TF_DIR}
 
   - id: terraform-version
     name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
     entrypoint: "/bin/bash"
-#    env:
-#      - TFDIR=${_TFDIR}
+    env:
+      - TF_DIR=${TF_DIR}
     args: 
       - -c
       - | 
@@ -40,8 +39,8 @@ steps:
   - id: terraform-fmt
     name: 'us-east4-docker.pkg.dev/automatic-potato-hjf/dev-container/automatic-potato-develop:latest'
     entrypoint: "/bin/bash"
-#    env:
-#      - TFDIR=${_TFDIR}
+    env:
+      - TF_DIR=${TF_DIR}
     args: 
       - -c 
       - |
