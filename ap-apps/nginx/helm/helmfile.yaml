@@ -1,0 +1,12 @@
+repositories:
+  - name: automatic-potato
+    url: https://broadinstitute.github.io/bits-helm-charts
+releases:
+  - name: potato-site
+    namespace: potato-site
+    createNamespace: true
+    chart: automatic-potato/nginx
+    version: 0.0.2
+    values:
+      - values.yaml
+      - terraform-vaules.yaml.gotmpl
