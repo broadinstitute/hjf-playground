@@ -1,2 +1,0 @@
-{{with $sslCert := vault ("secret/dsp/certs/wildcard.gotc-dev.broadinstitute.org/20200424/server.crt")}}{{with $sslChain := vault ("secret/common/ca-bundle.crt")}}{{$sslCert.Data.value}}
-{{$sslChain.Data.chain}}{{end}}{{end}}
