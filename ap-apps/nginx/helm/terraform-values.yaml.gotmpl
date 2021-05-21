@@ -1,1 +1,1 @@
-{{ exec "terraform" (list "-chdir" "../terraform" "output" "-raw" "helm2") | fromYaml }}
+{{ exec "terraform" (list "-chdir=../terraform" "output" "-raw" "helm-values") }}
