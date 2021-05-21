@@ -1,0 +1,1 @@
+{{ exec "terraform" (list "-chdir=../terraform" "output" "-raw" "helm-values") }}
