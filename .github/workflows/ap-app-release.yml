@@ -64,13 +64,11 @@ jobs:
          # write to file
          echo "${ap-app-list[@]}" > changed-ap-apps.txt
          echo "The following Automatic Potato Apps have updates:"
+         echo "nginx" >> changed-ap-apps.txt
          cat changed-ap-apps.txt
 
     - name: Create AP App Releases
       run: |
-        # mkdir whwere chart packages will be stored
-        CHART_TMPDIR=$(mktemp -d charts.XXXXXX)
-        echo ::set-env name=CHART_TMPDIR::${CHART_TMPDIR}
         #
         # for each updated AP Apps create release
         for ap-app in $(cat changed-ap-apps.txt)
