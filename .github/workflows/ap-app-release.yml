@@ -1,0 +1,79 @@
+name: Automatic-Potato App Releaser
+
+# This Github action is broken into two dependent jobs. 
+# First job (package-charts):
+#    - creates the helm chart packages for updated charts from the source git repository
+#    - create the new index.yaml file with updated chart versions required for the helm repo
+# Second job (update-helm-repo)
+#    - pushes the updated index.yaml file to helm repo git repostiory github pages site
+#
+# Breaking this action into two jobs allows each job to checkout the git repository
+#  associated with either the source code for the charts or the repository that hosts the
+#  github pages
+
+# Linting is not performed as part of the release since the PR job performs this process
+
+# This action only releases charts who has had any changed files under the directory for
+#  that chart (be it update, additions or deletions)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ap-apps/**
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Get list of files changed as part of this merge
+    - name: Get changed files
+      id: changed-files
+      uses: lots0logs/gh-action-get-changed-files@2.1.4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    # process changed file list for any changes to helm charts under the helm directory
+    - name: Create AP App list from changed files
+      id: ap-changed-list
+      run: |
+         # process list of changed files
+         changed_files=$(echo "${{ steps.changed-files.outputs.all }}" | tr -d '[|]' | sed -e 's;,; ;g')
+         ap-app-list=()
+         # for each file see if it part of a helm chart
+         for file in ${changed_files}
+         do
+            if echo $file | grep -qE "^ap-apps/"
+            then
+               # file under helm directory get subdir name
+               subdir=$(echo $file | cut -d '/' -f2)
+               # check if we seen this subdir before
+               if [[ ! " ${ap-app-list[@]} " =~ " ${subdir} " ]]
+               then
+                   # add to changed chart list
+                   ap-app-list+=( "${subdir}" )
+               fi
+           fi
+         done
+         # write to file
+         echo "${ap-app-list[@]}" > changed-ap-apps.txt
+         echo "The following Automatic Potato Apps have updates:"
+         cat changed-ap-apps.txt
+
+    - name: Create AP App Releases
+      run: |
+        # mkdir whwere chart packages will be stored
+        CHART_TMPDIR=$(mktemp -d charts.XXXXXX)
+        echo ::set-env name=CHART_TMPDIR::${CHART_TMPDIR}
+        #
+        # for each updated AP Apps create release
+        for ap-app in $(cat changed-ap-apps.txt)
+        do
+          echo "Creating release for AP App: (${ap-app})..."
+          gh release list
+          # use helm to create package
+        done
