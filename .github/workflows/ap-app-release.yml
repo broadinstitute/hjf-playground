@@ -70,6 +70,7 @@ jobs:
     - name: Create AP App Releases
       run: |
         #
+        echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
         # for each updated AP Apps create release
         for ap_app in $(cat changed-ap-apps.txt)
         do
