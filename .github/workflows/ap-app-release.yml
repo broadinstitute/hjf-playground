@@ -49,22 +49,22 @@ jobs:
          # for each file see if it part of a helm chart
          for file in ${changed_files}
          do
-            if echo $file | grep -qE "^apapps/"
+            if echo $file | grep -qE "^ap-apps/"
             then
                # file under helm directory get subdir name
                subdir=$(echo $file | cut -d '/' -f2)
                # check if we seen this subdir before
-               #if [[ ! " ${ap_app_list[@]} " =~ " ${subdir} " ]]
-               #then
-               #    # add to changed chart list
-               #    ap_app_list+=( "${subdir}" )
-               #fi
+               if [[ ! " ${ap_app_list[@]} " =~ " ${subdir} " ]]
+               then
+                   # add to changed chart list
+                   ap_app_list+=( "${subdir}" )
+               fi
             fi
          done
          # write to file
          echo "${ap_app_list[@]}" > changed-ap-apps.txt
          echo "The following Automatic Potato Apps have updates:"
-         echo "nginx" >> changed-ap-apps.txt
+         # echo "nginx" >> changed-ap-apps.txt
          cat changed-ap-apps.txt
 
     - name: Create AP App Releases
