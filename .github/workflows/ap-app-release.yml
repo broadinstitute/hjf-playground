@@ -45,7 +45,7 @@ jobs:
          set -xv
          # process list of changed files
          changed_files=$(echo "${{ steps.changed-files.outputs.all }}" | tr -d '[|]' | sed -e 's;,; ;g')
-         ap-app-list=()
+         ap_app_list=()
          # for each file see if it part of a helm chart
          for file in ${changed_files}
          do
@@ -54,15 +54,15 @@ jobs:
                # file under helm directory get subdir name
                subdir=$(echo $file | cut -d '/' -f2)
                # check if we seen this subdir before
-               #if [[ ! " ${ap-app-list[@]} " =~ " ${subdir} " ]]
+               #if [[ ! " ${ap_app_list[@]} " =~ " ${subdir} " ]]
                #then
                #    # add to changed chart list
-               #    ap-app-list+=( "${subdir}" )
+               #    ap_app_list+=( "${subdir}" )
                #fi
             fi
          done
          # write to file
-         echo "${ap-app-list[@]}" > changed-ap-apps.txt
+         echo "${ap_app_list[@]}" > changed-ap-apps.txt
          echo "The following Automatic Potato Apps have updates:"
          echo "nginx" >> changed-ap-apps.txt
          cat changed-ap-apps.txt
@@ -71,9 +71,9 @@ jobs:
       run: |
         #
         # for each updated AP Apps create release
-        for ap-app in $(cat changed-ap-apps.txt)
+        for ap_app in $(cat changed-ap-apps.txt)
         do
-          echo "Creating release for AP App: (${ap-app})..."
+          echo "Creating release for AP App: (${ap_app})..."
           gh release list
           # use helm to create package
         done
