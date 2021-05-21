@@ -17,7 +17,8 @@ name: Automatic-Potato App Releaser
 #  that chart (be it update, additions or deletions)
 
 on:
-  push:
+#  push:
+  pull_request:
     branches:
       - main
     paths:
@@ -41,6 +42,7 @@ jobs:
     - name: Create AP App list from changed files
       id: ap-changed-list
       run: |
+         set -xv
          # process list of changed files
          changed_files=$(echo "${{ steps.changed-files.outputs.all }}" | tr -d '[|]' | sed -e 's;,; ;g')
          ap-app-list=()
