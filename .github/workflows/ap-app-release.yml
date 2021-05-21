@@ -54,12 +54,12 @@ jobs:
                # file under helm directory get subdir name
                subdir=$(echo $file | cut -d '/' -f2)
                # check if we seen this subdir before
-               if [[ ! " ${ap-app-list[@]} " =~ " ${subdir} " ]]
-               then
-                   # add to changed chart list
-                   ap-app-list+=( "${subdir}" )
-               fi
-           fi
+               #if [[ ! " ${ap-app-list[@]} " =~ " ${subdir} " ]]
+               #then
+               #    # add to changed chart list
+               #    ap-app-list+=( "${subdir}" )
+               #fi
+            fi
          done
          # write to file
          echo "${ap-app-list[@]}" > changed-ap-apps.txt
