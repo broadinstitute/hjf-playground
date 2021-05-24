@@ -44,3 +44,4 @@ output "static_ip_address" {
   value       = module.example_site_static.static_ip.address
 }
 ```
+
