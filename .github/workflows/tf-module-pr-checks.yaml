@@ -55,11 +55,12 @@ jobs:
         # for each updated AP Apps create release
         for tf_module in $(cat changed-tf-modules.txt)
         do
-          if ! grep -q "${tf_module}/VERSION.TXT" <<< "${{ steps.changed-files.outputs.all }}"
+          if ! grep -q "tf-modules/${tf_module}/VERSION.TXT" <<< "${{ steps.changed-files.outputs.all }}"
           then
              failed_tf_modules+=( "${tf_module}" )
           fi 
         done
+        echo $failed_tf_modules
         if ! (( ${#failed_tf_modules[@]} ))
         then
            echo "The following Terraform modules were updated but did not have their VERSION.TXT file updated:"
