@@ -60,8 +60,7 @@ jobs:
              failed_tf_modules+=( "${tf_module}" )
           fi 
         done
-        echo $failed_tf_modules
-        if ! (( ${#failed_tf_modules[@]} ))
+        if  (( ${#failed_tf_modules[@]} > 0 ))
         then
            echo "The following Terraform modules were updated but did not have their VERSION.TXT file updated:"
            for failed_tf in ${failed_tf_modules}
