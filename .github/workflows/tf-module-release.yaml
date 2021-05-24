@@ -56,8 +56,8 @@ jobs:
         do
           # get version from file
           tfver=$(cat tf-modules/${tf_module}/VERSION.TXT)
-          echo "Creating release tag for TF Module (${tf_module} - version (${tfver}): tf-${tf_module}.${tfver}"
-          git tag tf-${tf_module}.${tfver}
+          echo "Creating release tag for TF Module (${tf_module} - version (${tfver}): tf-${tf_module}-${tfver}"
+          git tag tf-${tf_module}-${tfver}
         done
         # push tags
         git push --tags
