@@ -1,5 +1,6 @@
 name: Automatic-Potato Terraform Module Releaser
 
+
 on:
   push:
     branches:
