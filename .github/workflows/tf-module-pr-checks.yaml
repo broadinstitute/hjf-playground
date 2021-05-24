@@ -1,7 +1,12 @@
+# PR checks for updates to Terraform modules (tf-modules)
+#
+# TODO: 
+#   Improve outputs so that failed steps show list of files that failed
+#   Add the failure output as comment to PR
+
 name: Terraform Module PR check
 
 on:
-#  push:
   pull_request:
     branches:
       - main
@@ -20,12 +25,6 @@ jobs:
         uses: 'actionshub/terraform-lint@main'
         continue-on-error: true
 
-      - name: 'Output list'
-        if: steps.tf-fmt.outcome != 'success'
-        run: |
-           echo "The following files failed Terraform fmt check:"
-           echo "${{ steps.tf-fmt.outputs.all }}"
-        
 
   tflint:
     runs-on: 'ubuntu-latest'
@@ -106,7 +105,3 @@ jobs:
            done
            exit 1
         fi 
-
-
-
-# update last step to post comment to pr for failed tests.
