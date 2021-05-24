@@ -1,0 +1,105 @@
+# PR checks for updates to Terraform modules (tf-modules)
+#
+# TODO: 
+#   Improve outputs so that failed steps show list of files that failed
+#   Add the failure output as comment to PR
+
+name: Terraform Module PR check
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - tf-modules/**
+
+jobs:
+  tf-fmt:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout repo'
+        uses: 'actions/checkout@v2'
+
+      - name: 'Validate Terraform'
+        id: "tf-fmt"
+        uses: 'actionshub/terraform-lint@main'
+
+  tflint:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout repo'
+        uses: 'actions/checkout@v2'
+
+      - name: 'Run TFLint'
+        uses: 'devops-infra/action-tflint@master'
+
+  tfsec:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout repo'
+        uses: 'actions/checkout@v2'
+
+      - name: 'Run tfsec'
+        id: 'tfsec'
+        uses: 'triat/terraform-security-scan@v2.2.3'
+
+  version-bumnp-verify:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Get list of files changed as part of this merge
+    - name: Get changed files
+      id: changed-files
+      uses: lots0logs/gh-action-get-changed-files@2.1.4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    # process changed file list for any changes to helm charts under the helm directory
+    - name: Create list of updated TF modules from changed file list
+      id: tf-changed-list
+      run: |
+         # process list of changed files
+         changed_files=$(echo "${{ steps.changed-files.outputs.all }}" | tr -d '[|]' | sed -e 's;,; ;g')
+         tf_module_list=()
+         # for each file see if it part of a helm chart
+         for file in ${changed_files}
+         do
+            if echo $file | grep -qE "^tf-modules/"
+            then
+               # file under helm directory get subdir name
+               subdir=$(echo $file | cut -d '/' -f2)
+               # check if we seen this subdir before
+               if [[ ! " ${tf_module_list[@]} " =~ " ${subdir} " ]]
+               then
+                   # add to changed chart list
+                   tf_module_list+=( "${subdir}" )
+               fi
+            fi
+         done
+         # write to file
+         echo "${tf_module_list[@]}" > changed-tf-modules.txt
+         echo "The following Automatic Potato Apps have updates:"
+         cat changed-tf-modules.txt
+
+    - name: Verify that version was bumped
+      run: |
+        failed_tf_modules=()
+        # for each updated AP Apps create release
+        for tf_module in $(cat changed-tf-modules.txt)
+        do
+          if ! grep -q "tf-modules/${tf_module}/VERSION.TXT" <<< "${{ steps.changed-files.outputs.all }}"
+          then
+             failed_tf_modules+=( "${tf_module}" )
+          fi 
+        done
+        if  (( ${#failed_tf_modules[@]} > 0 ))
+        then
+           echo "The following Terraform modules were updated but did not have their VERSION.TXT file updated:"
+           for failed_tf in ${failed_tf_modules}
+           do
+             echo "${failed_tf}"
+           done
+           exit 1
+        fi 

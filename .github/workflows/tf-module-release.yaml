@@ -1,0 +1,63 @@
+name: Automatic-Potato Terraform Module Releaser
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - tf-modules/**
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Get list of files changed as part of this merge
+    - name: Get changed files
+      id: changed-files
+      uses: lots0logs/gh-action-get-changed-files@2.1.4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    # process changed file list for any changes to helm charts under the helm directory
+    - name: Create list of Terraform modules that were updated
+      id: tf-changed-list
+      run: |
+         # process list of changed files
+         changed_files=$(echo "${{ steps.changed-files.outputs.all }}" | tr -d '[|]' | sed -e 's;,; ;g')
+         tf_module_list=()
+         # for each file see if it part of a helm chart
+         for file in ${changed_files}
+         do
+            if grep -qE "^tf-modules/" <<< ${file}
+            then
+               # get sub-dir for module name
+               subdir=$(echo $file | cut -d '/' -f2)
+               # check if we seen this subdir before
+               if [[ ! " ${tf_module_list[@]} " =~ " ${subdir} " ]]
+               then
+                   # add to changed chart list
+                   tf_module_list+=( "${subdir}" )
+               fi
+           fi
+         done
+         # write to file
+         echo "${tf_module_list[@]}" > changed-tf-modules.txt
+         echo "The following Automatic Potato Apps have updates:"
+         cat changed-tf-modules.txt
+
+    - name: Create release tags for updated modules
+      run: |
+        #
+        # for each updated AP Apps create release
+        for tf_module in $(cat changed-tf-modules.txt)
+        do
+          # get version from file
+          tfver=$(cat tf-modules/${tf_module}/VERSION.TXT)
+          echo "Creating release tag for TF Module (${tf_module} - version (${tfver}): tf-${tf_module}.${tfver}"
+          git tag tf-${tf_module}.${tfver}
+        done
+        # push tags
+        git push --tags
