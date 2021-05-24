@@ -7,4 +7,3 @@ variable "site_name" {
   description = "name of the site to be added"
   type        = string
 }
-
