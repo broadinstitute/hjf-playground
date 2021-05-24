@@ -1,8 +1,10 @@
 name: Automatic-Potato Terraform Module Releaser
 
+
 on:
   push:
     branches:
+      - main-test
       - main
     paths:
       - tf-modules/**

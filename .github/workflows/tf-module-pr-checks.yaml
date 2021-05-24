@@ -9,6 +9,7 @@ name: Terraform Module PR check
 on:
   pull_request:
     branches:
+      - main-test
       - main
     paths:
       - tf-modules/**
