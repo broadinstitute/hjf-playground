@@ -23,8 +23,6 @@ jobs:
       - name: 'Validate Terraform'
         id: "tf-fmt"
         uses: 'actionshub/terraform-lint@main'
-        continue-on-error: true
-
 
   tflint:
     runs-on: 'ubuntu-latest'
