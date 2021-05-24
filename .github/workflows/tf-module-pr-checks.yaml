@@ -9,6 +9,34 @@ on:
       - tf-modules/**
 
 jobs:
+  tf-fmt:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout repo'
+        uses: 'actions/checkout@v2'
+
+      - name: 'Validate Terraform'
+        uses: 'actionshub/terraform-lint@main'
+
+  tflint:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout repo'
+        uses: 'actions/checkout@v2'
+
+      - name: 'Run TFLint'
+        uses: 'devops-infra/action-tflint@master'
+
+  tfsec:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout repo'
+        uses: 'actions/checkout@v2'
+
+      - name: 'Run tfsec'
+        id: 'tfsec'
+        uses: 'triat/terraform-security-scan@v2.0.2'
+
   version-bumnp-verify:
     runs-on: ubuntu-latest
     steps:
@@ -69,3 +97,7 @@ jobs:
            done
            exit 1
         fi 
+
+
+
+# update last step to post comment to pr for failed tests.
