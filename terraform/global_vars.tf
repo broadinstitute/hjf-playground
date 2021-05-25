@@ -1,6 +1,6 @@
 
 variable "broad_range_cidrs" {
-  type = "list"
+  type = list(string)
   default = [
     "69.173.64.0/19",
     "69.173.96.0/20",
