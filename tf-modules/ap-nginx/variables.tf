@@ -7,3 +7,4 @@ variable "ap-app-name" {
   description = "name of AP app"
   type        = string
 }
+
