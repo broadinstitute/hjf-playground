@@ -4,11 +4,11 @@ resource "random_id" "rule-id" {
 }
 
 resource "google_compute_firewall" "firewall-rule" {
-  provider       = google
+  provider = google
 
-  name           = length(var.firewall_rule_name) == 0 ? "firewall-rule-${random_id.rule-id.hex}" : var.firewall_rule_name
-  network        = var.firewall_rule_network
-  description    = "Firewall rulle created by module"
+  name        = length(var.firewall_rule_name) == 0 ? "firewall-rule-${random_id.rule-id.hex}" : var.firewall_rule_name
+  network     = var.firewall_rule_network
+  description = "Firewall rulle created by module"
 
   enable_logging = var.firewall_rule_logging
 

@@ -6,9 +6,9 @@
 
 # Cloud SQL database
 module "postgres" {
-    source   = "github.com/broadinstitute/terraform-shared.git//terraform-modules/cloudsql-postgres?ref=cloudsql-postgres-0.0.1-tf-0.12"
+  source = "github.com/broadinstitute/terraform-shared.git//terraform-modules/cloudsql-postgres?ref=cloudsql-postgres-0.0.1-tf-0.12"
 
-  enable_flag                 = var.postgres_num_instances > "0" ? "1" : "0"
+  enable_flag = var.postgres_num_instances > "0" ? "1" : "0"
   providers = {
     google.target = google.eddy
   }
