@@ -2,6 +2,8 @@ steps:
 - name: 'alpine'
   id:  Hello Cloud Build
   args: ["echo", "${_RPMS}"]
+- name: 'sdk'
+  args: ["jq", "-h"]
 #substitutions:
 #  _RPMS: "data"
 #  _RPMS: '$(body.message.data.rpms)'
