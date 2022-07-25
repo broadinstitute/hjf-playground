@@ -2,7 +2,7 @@ steps:
 - name: 'alpine'
   id:  Hello Cloud Build
   args: ["echo", "${_RPMS}"]
-- name: 'sdk'
+- name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
   args: ["jq", "-h"]
 #substitutions:
 #  _RPMS: "data"
