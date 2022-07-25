@@ -1,0 +1,6 @@
+steps:
+- name: 'alpine'
+  id:  Hello Cloud Build
+  args: ["echo", "Hello Cloud Build"]
+substitutions:
+  _RPMS: '$(body.message.data.rpms)'
