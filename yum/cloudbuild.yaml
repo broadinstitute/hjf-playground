@@ -7,8 +7,9 @@ steps:
     - 'pipefail'
     - '-c'
     - |-
+      touch /workspace/rpms.txt
+      echo "${_MSG}" | jq .
       # echo "${_MSG}" | jq  -r .rpms[] > /workspace/rpms.txt
-      echo "${_MSG}" 
 - name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
   id: verify
   entrypoint: "/bin/bash"
@@ -18,6 +19,3 @@ steps:
     - '-c'
     - |-
       cat /workspace/rpms.txt
-#substitutions:
-#  _RPMS: "data"
-#  _RPMS: '$(body.message.data.rpms)'
