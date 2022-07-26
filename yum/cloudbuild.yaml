@@ -14,6 +14,7 @@ steps:
       # echo "${_MSG}" > /workspace/msg.json 
       cat <<< "${_MSG}" > /workspace/msg.json
       cat /workspace/msg.json
+      jq -n -argjson data "${_MSG}" '.'
       # jq . /workspace/msg.json
       # echo "${_MSG}" | jq .
       # echo "${_MSG}" | jq  -r .rpms[] > /workspace/rpms.txt
