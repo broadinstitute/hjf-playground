@@ -1,8 +1,6 @@
 steps:
 - name: 'broadinstitute/dsde-toolbox'
   id:  process-msg
-#  env:
-#    - 'MSG="${_MSG}"'
   entrypoint: "/bin/bash"
   args:
     - '-eEuo'
