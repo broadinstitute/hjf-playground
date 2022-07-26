@@ -1,7 +1,4 @@
 steps:
-- name: 'alpine'
-  id:  test-msg
-  args: [ "env" ]
 - name: 'broadinstitute/dsde-toolbox'
   id:  process-msg
   env:
@@ -13,9 +10,9 @@ steps:
     - '-c'
     - |-
       touch /workspace/rpms.txt
-      jq -n --argjson data "${MSG}" '.'
-      echo "${MSG}" > /workspace/msg.json
-      jq '.' <<< "${MSG}"
+      # jq -n --argjson data "${MSG}" '.'
+      # echo "${MSG}" > /workspace/msg.json
+      # jq '.' <<< "${MSG}"
       # jq . /workspace/msg.json
       # echo "${_MSG}" | jq .
       # echo "${_MSG}" | jq  -r .rpms[] > /workspace/rpms.txt
