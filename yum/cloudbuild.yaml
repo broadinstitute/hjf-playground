@@ -1,7 +1,7 @@
 steps:
 - name: 'alpine'
   id:  test-msg
-  args: [ "echo", "${_MSG}" ]
+  args: [ "echo", "${_MSG}", ">/workspace/msg.json" ]
 - name: 'broadinstitute/dsde-toolbox'
   id:  process-msg
   entrypoint: "/bin/bash"
@@ -11,7 +11,7 @@ steps:
     - '-c'
     - |-
       touch /workspace/rpms.txt
-      echo "${_MSG}" > /workspace/msg.json 
+      # echo "${_MSG}" > /workspace/msg.json 
       cat /workspace/msg.json
       # jq . /workspace/msg.json
       # echo "${_MSG}" | jq .
