@@ -1,4 +1,13 @@
 steps:
+- name: 'alpine'
+  id:  test-msg
+  entrypoint: "/bin/bash"
+  args:
+    - '-eEuo'
+    - 'pipefail'
+    - '-c'
+    - |-
+      echo "${_MSG}"
 - name: 'broadinstitute/dsde-toolbox'
   id:  process-msg
   entrypoint: "/bin/bash"
