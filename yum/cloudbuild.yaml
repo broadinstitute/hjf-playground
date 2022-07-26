@@ -1,7 +1,6 @@
 steps:
 - name: 'alpine'
   id:  test-msg
-  entrypoint: "/bin/sh"
   args: [ "echo", "${_MSG}" ]
 - name: 'broadinstitute/dsde-toolbox'
   id:  process-msg
