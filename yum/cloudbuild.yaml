@@ -1,9 +1,22 @@
 steps:
-- name: 'alpine'
-  id:  Hello Cloud Build
-  args: ["echo", "${_RPMS}"]
+- name: 'broadinstitute/dsde-toolbox'
+  id:  process-msg
+  entrypoint: "/bin/bash"
+  args:
+    - '-eEuo'
+    - 'pipefail'
+    - '-c'
+    - |-
+      echo "${_MSG}" | jq  -r .rpms[] > /workspace/rpms.txt
 - name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
-  args: ["jq", "-h"]
+  id: verify
+  entrypoint: "/bin/bash"
+  args:
+    - '-eEuo'
+    - 'pipefail'
+    - '-c'
+    - |-
+      cat /workspace/rpms.txt
 #substitutions:
 #  _RPMS: "data"
 #  _RPMS: '$(body.message.data.rpms)'
