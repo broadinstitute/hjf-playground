@@ -10,9 +10,10 @@ steps:
     - '-c'
     - |-
       touch /workspace/rpms.txt
-      jq -n --argjson data "$${MSG}" '.'
+      env
+      # jq -n --argjson data "$${MSG}" '.'
       # echo "$${MSG}" > /workspace/msg.json
-      # jq '.' <<< "$${MSG}"
+      jq '.' <<< "$${MSG}"
       # jq . /workspace/msg.json
       # echo "${_MSG}" | jq .
       # echo "${_MSG}" | jq  -r .rpms[] > /workspace/rpms.txt
@@ -25,4 +26,4 @@ steps:
     - '-c'
     - |-
       cat /workspace/rpms.txt
-      cat /workspace/msg.json
+      # cat /workspace/msg.json
