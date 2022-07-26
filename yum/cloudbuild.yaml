@@ -13,7 +13,7 @@ steps:
       touch /workspace/rpms.txt
       echo "${_MSG}" > /workspace/msg.json 
       cat /workspace/msg.json
-      jq . /workspace/msg.json
+      # jq . /workspace/msg.json
       # echo "${_MSG}" | jq .
       # echo "${_MSG}" | jq  -r .rpms[] > /workspace/rpms.txt
 - name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
@@ -25,3 +25,4 @@ steps:
     - '-c'
     - |-
       cat /workspace/rpms.txt
+      cat /workspace/msg.json
