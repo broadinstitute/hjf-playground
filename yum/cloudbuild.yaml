@@ -3,7 +3,7 @@ steps:
   id:  process-msg
   entrypoint: "/bin/bash"
   env:
-    'MSG=${_MSG}'
+    - 'MSG=${_MSG}'
   args:
     - '-eEuo'
     - 'pipefail'
