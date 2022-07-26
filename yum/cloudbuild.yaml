@@ -4,6 +4,8 @@ steps:
   args: [ "env" ]
 - name: 'broadinstitute/dsde-toolbox'
   id:  process-msg
+  env:
+    - 'MSG=${_MSG}'
   entrypoint: "/bin/bash"
   args:
     - '-eEuo'
@@ -11,12 +13,9 @@ steps:
     - '-c'
     - |-
       touch /workspace/rpms.txt
-      env
-      # echo "${_MSG}" > /workspace/msg.json 
-      cat <<< "${_MSG}" > /workspace/msg.json
-      cat /workspace/msg.json
-      # jq -n --argjson data "${_MSG}" '.'
-      #jq '.' <<< "${_MSG}"
+      jq -n --argjson data "${MSG}" '.'
+      echo "${MSG}" > /workspace/msg.json
+      jq '.' <<< "${MSG}"
       # jq . /workspace/msg.json
       # echo "${_MSG}" | jq .
       # echo "${_MSG}" | jq  -r .rpms[] > /workspace/rpms.txt
