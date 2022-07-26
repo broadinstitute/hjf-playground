@@ -12,7 +12,7 @@ steps:
     - |-
       touch /workspace/rpms.txt
       # echo "${_MSG}" > /workspace/msg.json 
-      printf "${_MSG}" > /workspace/msg.json
+      cat <<< "${_MSG}" > /workspace/msg.json
       cat /workspace/msg.json
       # jq . /workspace/msg.json
       # echo "${_MSG}" | jq .
