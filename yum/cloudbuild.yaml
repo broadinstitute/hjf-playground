@@ -10,10 +10,7 @@ steps:
     - '-c'
     - |-
       touch /workspace/rpms.txt
-      base64 <<< "${_MSG}" > /workspace/msg.b64
-      cat /workspace/msg.b64
-      base64 -d /workspace/msg.b64
-      # jq -n --argjson data "$${MSG}" '.'
+      jq -n --argjson data "$${MSG}" '.'
       # echo "$${MSG}" > /workspace/msg.json
       # jq '.' <<< "$${MSG}"
       # jq . /workspace/msg.json
