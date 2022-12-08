@@ -8,11 +8,10 @@ LOGDIR="/home/unix/sa-ferrara/aou-upgrade"
 SLEEP_TIME=300
 
 # target version string
-dragen_upgrade="07.021.624.3.10.4"
 dragen_upgrade="07.021.604.3.7.8"
 
 # target puppet branch
-puppet_branch="aou_3.7"
+puppet_branch="aou_378"
 puppet_branch="hf_bond_ap"
 
 # Get hostname
