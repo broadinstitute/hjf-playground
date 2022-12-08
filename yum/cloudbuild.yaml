@@ -1,7 +1,9 @@
+#
+# IMPORTANT: setting MSG env var to the substitution value preserves json 
+#   content.
 steps:
 - name: 'broadinstitute/dsde-toolbox'
   id:  process-msg
-  entrypoint: "/bin/bash"
   env:
     - 'MSG=${_MSG}'
   args:
