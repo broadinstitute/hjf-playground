@@ -5,7 +5,7 @@ set -o pipefail
 LOGDIR="/home/unix/sa-ferrara/aou-upgrade"
 
 # how long to wait between checking for slurm node to drain
-SLEEP_TIME=600
+SLEEP_TIME=300
 
 # target version string
 dragen_upgrade="07.021.624.3.10.4"
@@ -114,8 +114,16 @@ fi
 while [[ "${slurm_state}" == "draining" ]]
 do
    log_msg "Waiting for node to complete draining - sleeping (${SLEEP_TIME})"
-   write_state BEGIN "Waiting to drain"
+   write_state BEGIN "Waiting to drain (${slurm_state})"
    sleep ${SLEEP_TIME}
+   slurm_state=$(get_node_state)
+   retcode=$?
+   if [ "${retcode}" -ne 0 ]
+   then
+     log_msg "ERROR: unable to capture current slurm state(${slurm_state}). Exitting.."
+     write_state FAILED "Waiting to drain..."
+     exit 1
+   fi
 done
 
 # log ready to upgrade
