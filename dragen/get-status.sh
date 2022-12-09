@@ -8,7 +8,7 @@
 #  
 LOGDIR="/home/unix/sa-ferrara/aou-upgrade-378"
 
-declare -a state_array=()
+declare -A state_array=()
 
 # loop through all state files
 for statefile in ${LOGDIR}/*.state
@@ -16,12 +16,13 @@ do
    host=$(basename ${statefile} | sed -e 's/\.state//')
    state_value=$(cut -d ':' -f4 ${statefile})
    state_str=$(cut -d ':' -f5- ${statefile} | tr " " "_")
-   state_array["${state_val}_${state_str}"]="$state_array[${state_str}] ${host}"
+   key_value="${state_value}_${state_str}"
+   state_array[${key_value}]+=" ${host}"
 done
 
-for key in "${!state_array[@]"
+for key in "${!state_array[@]}"
 do
-   echo "${key}: ${state_array[${key}]"
+   echo "${key}: ${state_array[${key}]}"
 done
 
 # output counts and list 
