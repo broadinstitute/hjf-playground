@@ -6,7 +6,7 @@
 #  - successful upgrade
 #  - in-progress upgrade
 #  
-LOGDIR="/seq/dragen/aou-upgrade-378"
+LOGDIR="/home/unix/sa-ferrara/aou-upgrade-378"
 
 declare -a state_array=()
 
