@@ -206,8 +206,8 @@ write_state RUNNING "self_test successful"
 # run smoke_test
 log_msg "Running smoke_test boot up test"
 write_state RUNNING "Running smoke_test"
-# cmd_output=$(echo systemctl restart smoke_test 2>&1)
-cmd_output=$(/home/unix/sa-ferrara/Broad-repos/bits-puppet/dist/broad_misc/files/misc_scripts/dragen/smoke_test.sh --force 2>&1)
+# cmd_output=$(/home/unix/sa-ferrara/Broad-repos/bits-puppet/dist/broad_misc/files/misc_scripts/dragen/smoke_test.sh --force 2>&1)
+cmd_output=$(echo systemctl restart smoke_test 2>&1)
 retcode=$?
 if [ "${retcode}" -ne 0 ]
 then
