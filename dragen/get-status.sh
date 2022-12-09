@@ -14,8 +14,9 @@ declare -a state_array=()
 for statefile in ${LOGDIR}/*.state
 do
    host=$(basename ${statefile} | sed -e 's/\.state//')
-   state_str=$(cut -d ':' -f4- ${statefile})
-   state_array["${state_str}"]="$state_array["${state_str}"] ${host}"
+   state_value=$(cut -d ':' -f4 ${statefile})
+   state_str=$(cut -d ':' -f5- ${statefile} | tr " " "_")
+   state_array["${state_val}_${state_str}"]="$state_array[${state_str}] ${host}"
 done
 
 for key in "${!state_array[@]"
