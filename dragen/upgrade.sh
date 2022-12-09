@@ -221,21 +221,21 @@ log_msg "smoke_test succeeded"
 write_state RUNNING "smoke_test successful"
 
 # put node back into idle state
-log_msg "Putting node back into idle state"
-write_state RUNNING "Putting node in idle state"
-cmd_output=$(scontrol update node=${my_host} state=idle reason=SoftwareUpgradeComplete 2>&1)
-retcode=$?
-if [ "${retcode}" -ne 0 ]
-then
-   #  - failed - exist FAILED
-   log_msg "scontrol command returned non-zero (${retcode}) status"
-   log_msg "${cmd_output}"
-   write_state FAILED "scontrol command returned non-zero status(${retcode)}"
-   exit 1
-fi
+# log_msg "Putting node back into idle state"
+# write_state RUNNING "Putting node in idle state"
+# cmd_output=$(scontrol update node=${my_host} state=idle reason=SoftwareUpgradeComplete 2>&1)
+# retcode=$?
+# if [ "${retcode}" -ne 0 ]
+# then
+#    #  - failed - exist FAILED
+#    log_msg "scontrol command returned non-zero (${retcode}) status"
+#    log_msg "${cmd_output}"
+#    write_state FAILED "scontrol command returned non-zero status(${retcode)}"
+#    exit 1
+# fi
 
-log_msg "Scontrol successful"
-write_state RUNNING "Scontrol successful"
+# log_msg "Scontrol successful"
+# write_state RUNNING "Scontrol successful"
 
 slurm_state=$(get_node_state)
 retcode=$?
@@ -246,16 +246,16 @@ then
   exit 1
 fi
 
-if [[ "${slurm_state}" != "idle" ]]
-then
-   # node is not in correct state
-   log_msg "WARNING: Node updated and tested but could not put in idle state (${slurm_state}). Exitting..."
-   write_state WARNING "Node updated and tested but node not in correct state (${slurm_state})"
-   exit 1
-fi
+# if [[ "${slurm_state}" != "idle" ]]
+# then
+#   # node is not in correct state
+#   log_msg "WARNING: Node updated and tested but could not put in idle state (${slurm_state}). Exitting..."
+#   write_state WARNING "Node updated and tested but node not in correct state (${slurm_state})"
+#   exit 1
+#fi
 
-log_msg "Node (${my_host}) back in idle state"
-write_state SUCCESS "Node back in idle state"
+#log_msg "Node (${my_host}) back in idle state"
+#write_state SUCCESS "Node back in idle state"
 
 dragen_version=$(get_dragen)
 
