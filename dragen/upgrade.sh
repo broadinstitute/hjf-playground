@@ -233,8 +233,34 @@ then
    write_state FAILED "scontrol command returned non-zero status(${retcode)}"
    exit 1
 fi
+
+log_msg "Scontrol successful"
+write_state RUNNING "Scontrol successful"
+
+slurm_state=$(get_node_state)
+retcode=$?
+if [ "${retcode}" -ne 0 ]
+then
+  log_msg "ERROR: unable to capture current slurm state(${slurm_state}). Exitting.."
+  write_state WARNING "Node updated and tested but could not get node state (${retcode})"
+  exit 1
+fi
+
+if [[ "${slurm_state}" != "idle" ]]
+then
+   # node is not in correct state
+   log_msg "WARNING: Node updated and tested but could not put in idle state (${slurm_state}). Exitting..."
+   write_state WARNING "Node updated and tested but node not in correct state (${slurm_state})"
+   exit 1
+fi
+
 log_msg "Node (${my_host}) back in idle state"
 write_state SUCCESS "Node back in idle state"
+
+dragen_version=$(get_dragen)
+
+log_msg "Node (${my_host}) upgrade complete ready for production use running version (${dragen_version})"
+write_state SUCCESS "Node in state (${slurm_state}) Running (${dragen_version})"
 
 # exit success
 exit 0
