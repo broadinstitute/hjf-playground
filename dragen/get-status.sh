@@ -6,9 +6,21 @@
 #  - successful upgrade
 #  - in-progress upgrade
 #  
+LOGDIR="/seq/dragen/aou-upgrade-378"
+
+declare -a state_array=()
 
 # loop through all state files
+for statefile in ${LOGDIR}/*.state
+do
+   host=$(basename ${statefile} | sed -e 's/\.state//')
+   state_str=$(cut -d ':' -f4- ${statefile})
+   state_array["${state_str}"]="$state_array["${state_str}"] ${host}"
+done
 
-# count dragens in state and dragen host list
+for key in "${!state_array[@]"
+do
+   echo "${key}: ${state_array[${key}]"
+done
 
 # output counts and list 

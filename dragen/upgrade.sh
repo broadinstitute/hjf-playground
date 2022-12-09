@@ -3,6 +3,7 @@ set -o pipefail
 
 # set LOGDIR location
 LOGDIR="/home/unix/sa-ferrara/aou-upgrade"
+LOGDIR="/seq/dragen/aou-upgrade-378"
 
 # how long to wait between checking for slurm node to drain
 SLEEP_TIME=300
