@@ -11,8 +11,8 @@ SLEEP_TIME=300
 dragen_upgrade="07.021.604.3.7.8"
 
 # target puppet branch
+# puppet_branch="hf_bond_ap"
 puppet_branch="aou_378"
-puppet_branch="hf_bond_ap"
 
 # Get hostname
 my_host=$(hostname --short)
