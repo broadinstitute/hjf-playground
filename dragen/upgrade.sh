@@ -200,6 +200,9 @@ then
    write_state FAILED "self_test returned non-zero status(${retcode)}"
    exit 1
 fi
+# grab status to get logfile paths
+cmd_output=$(systemctl status self_test 2>&1)
+log_msg "${cmd_output}"
 log_msg "self_test succeeded"
 write_state RUNNING "self_test successful"
 
@@ -217,6 +220,9 @@ then
    write_state FAILED "smoke_test returned non-zero status(${retcode)}"
    exit 1
 fi
+# grab status to get logfile paths
+cmd_output=$(systemctl status smoke_test 2>&1)
+log_msg "${cmd_output}"
 log_msg "smoke_test succeeded"
 write_state RUNNING "smoke_test successful"
 
