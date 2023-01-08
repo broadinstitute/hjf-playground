@@ -1,0 +1,51 @@
+
+#availableSecrets:
+#  secretManager:
+#  - versionName: projects/${PROJECT_ID}/secrets/${PROJECT_ID}-ap-service-account/versions/latest
+#    env: SA_JSON
+
+options:
+  env:
+    - DOTKIT_BUILD_JSON='${_DOTKIT_BUILD_JSON}'
+    - DOTKIT_BUILD_BUCKET="gs://broad-hjf-dotkit-build"
+    - DOTKIT_SOURCE_BUCKET="gs://broad-hjf-dotkit-source"
+    - DOTKIT_PKG_BUCKET="gs://broad-hjf-dotkit-package"
+
+steps:
+  - id: dotkit-setup
+    name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
+#    secretEnv: [ 'SA_JSON' ]
+    entrypoint: "/bin/bash"
+#    env:
+#      - PROJECT_ID=${PROJECT_ID}
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - '-c' 
+      - |-
+        echo "Get JSON, get source and set up environment"
+
+  - id: dotkit-build
+    name: 'us-docker.pkg.dev/automatic-potato-hjf/hjf-test-repo/dotkit-builder:latest'
+    entrypoint: "/bin/bash"
+    env:
+      - TF_DIR=${_TF_DIR}
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - -c
+      - | 
+        echo "Build, test, install software"
+
+  - id: dotkit-save
+    name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
+    entrypoint: "/bin/bash"
+    env:
+      - TF_DIR=${_TF_DIR}
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - -c 
+      - |
+        echo "Create tarball and write it to bucket"
+
