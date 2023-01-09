@@ -10,7 +10,7 @@ steps:
 # add redhat registry auth
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
-  args: ['-c', 'docker login --username=$$USERNAME --password=$$PASSWORD']
+  args: ['-c', 'docker login --username=$$USERNAME --password=$$PASSWORD registry.redhat.io']
   secretEnv: ['USERNAME', 'PASSWORD']
 # always build using git short hash
 - name: 'gcr.io/cloud-builders/docker'
