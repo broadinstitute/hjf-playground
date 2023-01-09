@@ -38,7 +38,7 @@ steps:
         ls -al /workspace/build
         cd /workspace/build
         echo "BUILD: Running configure ..."
-        ./configure --prefix=$INSTALLPATH
+        ./configure --prefix=$${INSTALLPATH}
         echo "BUILD: Running make all ..."
         make
         echo "BUILD: Running make test-all ..."
