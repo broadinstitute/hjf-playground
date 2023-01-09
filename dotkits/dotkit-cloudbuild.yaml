@@ -7,17 +7,14 @@
 options:
   env:
     - DOTKIT_BUILD_JSON='${_DOTKIT_BUILD_JSON}'
-    - DOTKIT_BUILD_BUCKET="gs://broad-hjf-dotkit-build"
-    - DOTKIT_SOURCE_BUCKET="gs://broad-hjf-dotkit-source"
-    - DOTKIT_PKG_BUCKET="gs://broad-hjf-dotkit-package"
+    - DOTKIT_BUILD_BUCKET=gs://broad-hjf-dotkit-build
+    - DOTKIT_SOURCE_BUCKET=gs://broad-hjf-dotkit-source
+    - DOTKIT_PKG_BUCKET=gs://broad-hjf-dotkit-package
 
 steps:
   - id: dotkit-setup
     name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
-#    secretEnv: [ 'SA_JSON' ]
     entrypoint: "/bin/bash"
-#    env:
-#      - PROJECT_ID=${PROJECT_ID}
     args: 
       - '-eEuo'
       - 'pipefail'
@@ -25,13 +22,13 @@ steps:
       - |-
         echo "Get JSON, get source and set up environment"
         mkdir /workspace/build
-        echo "gsutil cat $${DOTKIT_SOURCE_BUCKET}/bcftools/bcftools-1.16.targ.bz2 | tar -C /workspace/build -xzf -"
+        gsutil cat $${DOTKIT_SOURCE_BUCKET}/bcftools/bcftools-1.16.targ.bz2 | tar -C /workspace/build -xzf -
 
   - id: dotkit-build
     name: 'us-docker.pkg.dev/automatic-potato-hjf/hjf-test-repo/dotkit-builder:latest'
     entrypoint: "/bin/bash"
     env:
-      - TF_DIR=${_TF_DIR}
+      - INSTALLPATH="/broad/software/free/Linux/redhat_7_x86_64/pkgs/bcftools/bcftools_1.16"
     args: 
       - '-eEuo'
       - 'pipefail'
@@ -39,12 +36,21 @@ steps:
       - | 
         echo "Build, test, install software"
         ls -al /workspace/build
+        cd /workspace/build
+        echo "BUILD: Running configure ..."
+        ./configure --prefix=$INSTALLPATH
+        echo "BUILD: Running make all ..."
+        make
+        echo "BUILD: Running make test-all ..."
+        make test-all
+        echo "BUILD: Running make install ..."
+        make install
 
   - id: dotkit-save
     name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
     entrypoint: "/bin/bash"
     env:
-      - TF_DIR=${_TF_DIR}
+      - INSTALLPATH="/broad/software/free/Linux/redhat_7_x86_64/pkgs/bcftools/bcftools_1.16"
     args: 
       - '-eEuo'
       - 'pipefail'
