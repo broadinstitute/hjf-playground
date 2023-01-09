@@ -22,7 +22,7 @@ steps:
       - |-
         echo "Get JSON, get source and set up environment"
         mkdir /workspace/build
-        gsutil cat $${DOTKIT_SOURCE_BUCKET}/bcftools/bcftools-1.16.tar.bz2 | tar -C /workspace/build -xjf -
+        gsutil cat $${DOTKIT_SOURCE_BUCKET}/bcftools/bcftools-1.16.tar.bz2 | tar -C /workspace/build -xjvf -
 
   - id: dotkit-build
     name: 'us-docker.pkg.dev/automatic-potato-hjf/hjf-test-repo/dotkit-builder:latest'
@@ -36,7 +36,7 @@ steps:
       - | 
         echo "Build, test, install software"
         ls -al /workspace/build
-        cd /workspace/build
+        cd /workspace/build/bcftools-1.16
         echo "BUILD: Running configure ..."
         ./configure --prefix=$${INSTALLPATH}
         echo "BUILD: Running make all ..."
