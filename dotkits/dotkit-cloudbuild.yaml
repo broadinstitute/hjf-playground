@@ -28,7 +28,7 @@ steps:
     name: 'us-docker.pkg.dev/automatic-potato-hjf/hjf-test-repo/dotkit-builder:latest'
     entrypoint: "/bin/bash"
     env:
-      - INSTALLPATH=/broad/software/free/Linux/redhat_7_x86_64/pkgs/bcftools/bcftools_1.16
+      - INSTALLPATH=/broad/software/free/Linux/redhat_7_x86_64/pkgs
     args: 
       - '-eEuo'
       - 'pipefail'
@@ -38,13 +38,16 @@ steps:
         ls -al /workspace/build
         cd /workspace/build/bcftools-1.16
         echo "BUILD: Running configure ..."
-        ./configure --prefix=$${INSTALLPATH}
+        ./configure --prefix=$${INSTALLPATH}/bcftools/bcftools_1.16
         echo "BUILD: Running make all ..."
         make
         echo "BUILD: Running make test-all ..."
         make test-all
         echo "BUILD: Running make install ..."
         make install
+        echo "Creating tarball ..."
+        cd $${INSTALLPATH}/bcftools
+        tar czf /workspace/bcftools_1.16.tar.gz bcftools_1.16
 
   - id: dotkit-save
     name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
@@ -57,4 +60,5 @@ steps:
       - -c 
       - |
         echo "Create tarball and write it to bucket"
+        gsutil cp /workspace/bcftools_1.16.tar.gz $${DOTKIT_PKG_BUCKET}/redhat_7_x86_64/bcftools/bcftools_1.16.tar.gz
 
