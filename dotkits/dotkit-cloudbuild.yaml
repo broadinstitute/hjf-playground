@@ -28,7 +28,7 @@ steps:
     name: 'us-docker.pkg.dev/automatic-potato-hjf/hjf-test-repo/dotkit-builder:latest'
     entrypoint: "/bin/bash"
     env:
-      - INSTALLPATH="/broad/software/free/Linux/redhat_7_x86_64/pkgs/bcftools/bcftools_1.16"
+      - INSTALLPATH=/broad/software/free/Linux/redhat_7_x86_64/pkgs/bcftools/bcftools_1.16
     args: 
       - '-eEuo'
       - 'pipefail'
