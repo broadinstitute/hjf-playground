@@ -1,0 +1,15 @@
+steps:
+# always build using git short hash
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', '${_REPO_PATH}/${_CONTAINER_NAME}:${SHORT_SHA}', '.']
+  dir: '${_CLOUDBUILD_DIR_PATH}'
+  id: 'build'
+# tag with passed in tag
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', '${_REPO_PATH}/${_CONTAINER_NAME}:${SHORT_SHA}', '${_REPO_PATH}/${_CONTAINER_NAME}:${_CONTAINER_TAG}' ]
+  id: 'tag'
+# push both
+images: ['${_REPO_PATH}/${_CONTAINER_NAME}:${_CONTAINER_TAG}', '${_REPO_PATH}/${_CONTAINER_NAME}:${SHORT_SHA}']
+timeout: 3600s
+options:
+  substitution_option: 'ALLOW_LOOSE'
