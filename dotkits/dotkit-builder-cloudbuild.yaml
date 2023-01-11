@@ -1,0 +1,101 @@
+
+options:
+  env:
+    - DOTKIT_BUILD_JSON=${_DOTKIT_BUILD_JSON}
+    - OS_DISTRO=${_OS_DISTRO}
+    - OS_RELEASE=${_OS_RELEASE}
+    - DOTKIT_BUILD_BUCKET=gs://broad-hjf-dotkit-build
+    - DOTKIT_SOURCE_BUCKET=gs://broad-hjf-dotkit-source
+    - DOTKIT_PKG_BUCKET=gs://broad-hjf-dotkit-package
+    - INSTALL_ROOT=/broad/software
+    - OS=Linux
+
+steps:
+  # instead of adding jq command each time 
+  # Could break steps into google-cloud-cli to get json and extract source from bucket
+  # Next step would be a different container to convert json into evn file via jq
+  - id: dotkit-setup
+    name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
+    entrypoint: "/bin/bash"
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - '-c' 
+      - |-
+        # Need jq to process json file
+        apt-get install -y jq
+        echo "Get JSON ..."
+        gsutil cp $${DOTKIT_BUILD_JSON} /workspace/
+        # get json object filename
+        JSON_FILE=$(basename $${DOTKIT_BUILD_JSON})
+        echo "Process JSON file ..."
+        # process json into environment file
+        PKG_NAME=$(jq -r '."PKG_NAME"' /workspace/$${JSON_FILE})
+        echo "PKG_NAME=\"$${PKG_NAME}\"" > /workspace/env.sh
+        PKG_VERSION=$(jq -r '."PKG_VERSION"' /workspace/$${JSON_FILE})
+        echo "PKG_VERSION=\"$${PKG_VERSION}\"" > /workspace/env.sh
+        PKG_SOURCE=$(jq -r '."PKG_SOURCE"' /workspace/$${JSON_FILE})
+        echo "PKG_SOURCE=\"$${PKG_SOURCE}\"" > /workspace/env.sh
+        LICENSE=$(jq -r '."LICENSE"' /workspace/$${JSON_FILE})
+        echo "LICENSE=\"$${LICENSE}\"" > /workspace/env.sh
+        echo "unpack package source"
+        SOURCE_FILE=$(basename $${PKG_SOURCE})
+        SOURCE_EXT=$${SOURCE_FILE##*.}
+        case $${SOURCE_EXT} in
+           "bz2")
+             UNPACK="tar -xjf -"
+             ;;
+           "gz|tgz")
+             UNPACK="tar -xzf -"
+             ;;
+           "zip")
+             UNPACK="unzip"
+             ;;
+        esac
+        mkdir /workspace/build
+        cd /workspace/build
+        gsutil cat $${PKG_SOURCE} | $${UNPACK}
+
+  - id: dotkit-build
+    name: 'us-docker.pkg.dev/automatic-potato-hjf/hjf-test-repo/dotkit-builder-${_OS_DISTRO}${_OS_RELEASE}:latest'
+    entrypoint: "/bin/bash"
+    env:
+      - INSTALLPATH=/broad/software/free/Linux/redhat_8_x86_64/pkgs
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - -c
+      - | 
+        # source environment
+        . /workspace/env.sh
+        echo "Build, test, install software"
+        SOURCE_DIR=$(ls -1 /workspace/build)
+        PKG_DIR=$(echo $${PKG_NAME}_$${PKG_VERSION} | sed 's/-/_/' | tr '[A-Z]' '[a-z]')
+        cd /workspace/build/$${SOURCE_DIR}
+        echo "BUILD: Running configure ..."
+        ./configure --prefix=$${INSTALL_ROOT}/$${LICENSE}/$${OS}/${_OS_DISTRO}_${_OS_RELEASE}_x86_64/pkgs/$${PKG_NAME}/$${PKG_DIR}
+        echo "BUILD: Running make all ..."
+        make
+        echo "BUILD: Running make test-all ..."
+        make test-all
+        echo "BUILD: Running make install ..."
+        make install
+        echo "Creating tarball ..."
+        cd $${INSTALL_ROOT}/$${LICENSE}/$${OS}/${_OS_DISTRO}_${_OS_RELEASE}_x86_64/pkgs
+        tar czf /workspace/$${PKG_NAME}_$${PKG_VERSION}.tar.gz $${PKG_DIR}
+
+  - id: dotkit-save
+    name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
+    entrypoint: "/bin/bash"
+    env:
+      - INSTALLPATH="/broad/software/free/Linux/redhat_8_x86_64/pkgs/bcftools/bcftools_1.16"
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - -c 
+      - |
+        # source environment
+        . /workspace/env.sh
+        echo "Create tarball and write it to bucket"
+        gsutil cp /workspace/$${PKG_NAME}_$${PKG_VERSION}.tar.gz $${DOTKIT_PKG_BUCKET}/${_OS_DISTRO}_${_OS_RELEASE}_x86_64/$${PKG_NAME}/$${PKG_NAME}_$${PKG_VERSION}.tar.gz
+
