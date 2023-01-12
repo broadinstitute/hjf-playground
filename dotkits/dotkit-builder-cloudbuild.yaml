@@ -83,7 +83,7 @@ steps:
         echo "BUILD: Running make install ..."
         make install
         echo "Creating tarball ..."
-        cd $${INSTALL_ROOT}/$${LICENSE}/$${OS}/${_OS_DISTRO}_${_OS_RELEASE}_x86_64/pkgs
+        cd $${INSTALL_ROOT}/$${LICENSE}/$${OS}/${_OS_DISTRO}_${_OS_RELEASE}_x86_64/pkgs/$${PKG_NAME}
         tar czf /workspace/$${PKG_NAME}_$${PKG_VERSION}.tar.gz $${PKG_DIR}
 
   - id: dotkit-save
