@@ -31,13 +31,14 @@ steps:
         echo "Process JSON file ..."
         # process json into environment file
         PKG_NAME=$(jq -r '."PKG_NAME"' /workspace/$${JSON_FILE})
-        echo "PKG_NAME=\"$${PKG_NAME}\"" > /workspace/env.sh
+        echo "PKG_NAME=\"$${PKG_NAME}\"" >> /workspace/env.sh
         PKG_VERSION=$(jq -r '."PKG_VERSION"' /workspace/$${JSON_FILE})
-        echo "PKG_VERSION=\"$${PKG_VERSION}\"" > /workspace/env.sh
+        echo "PKG_VERSION=\"$${PKG_VERSION}\"" >> /workspace/env.sh
         PKG_SOURCE=$(jq -r '."PKG_SOURCE"' /workspace/$${JSON_FILE})
-        echo "PKG_SOURCE=\"$${PKG_SOURCE}\"" > /workspace/env.sh
+        echo "PKG_SOURCE=\"$${PKG_SOURCE}\"" >> /workspace/env.sh
         LICENSE=$(jq -r '."LICENSE"' /workspace/$${JSON_FILE})
-        echo "LICENSE=\"$${LICENSE}\"" > /workspace/env.sh
+        echo "LICENSE=\"$${LICENSE}\"" >> /workspace/env.sh
+        cat /workspace/env.sh
         echo "unpack package source"
         SOURCE_FILE=$(basename $${PKG_SOURCE})
         SOURCE_EXT=$${SOURCE_FILE##*.}
@@ -55,6 +56,7 @@ steps:
         mkdir /workspace/build
         cd /workspace/build
         gsutil cat $${PKG_SOURCE} | $${UNPACK}
+        ls -al
 
   - id: dotkit-build
     name: 'us-docker.pkg.dev/automatic-potato-hjf/hjf-test-repo/dotkit-builder-${_OS_DISTRO}${_OS_RELEASE}:latest'
