@@ -78,14 +78,14 @@ write_state RUNNING "Patch-check complete"
 
 case ${retcode} in
   100) log_msg "Needs PATCHING"
-       write_state RUNNING "Needs-patching"
+       write_state RUNNING "Needs Patching"
     ;;
   0) log_msg "Fully patched"
      write_state COMPLETE "Fully-Patched"
      exit 0
     ;;
   *) log_msg "Unknown yum check-update return code"
-     write_state RUNNING "Unknown-Error"
+     write_state COMPLETE "Unknown-Error"
      cp ${TMP_FILE} ${TMP_FILE}.err ${LOGDIR}/${my_host}/
      exit 0
     ;;
@@ -97,4 +97,6 @@ log_msg "Building patch list"
 write_state RUNNING "Building-patchlist"
 sed -n -e '/^$/,$p' < ${TMP_FILE}  | sed '/^[[:space:]]*$/d' > ${LOGDIR}/${my_host}/patch-list.txt
 
+log_msg "run COMPLETE"
+write_state COMPLETE "Needs Patching"
 exit ${retcode}
