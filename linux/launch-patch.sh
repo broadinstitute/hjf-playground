@@ -71,8 +71,11 @@ write_state RUNNING Launch
 
 # loop through
 
+echo -n "Beginning run: "
+
 for i in  $(cat ${HOSTLIST})
 do 
+  echo -n "."
   log_msg "Running on host ${i}..."
   write_state RUNNING "Host: ${i}..."
  
@@ -99,3 +102,6 @@ do
   fi
 done
 
+echo "DONE"
+log_msg "Launch run complete"
+write_state DONE Launch
