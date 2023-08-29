@@ -17,11 +17,9 @@ HOSTLOGDIR="${LOGDIR}/${my_host}"
 # tmpfile
 TMP_FILE=$(mktemp /tmp/${my_host}.XXXX)
 
-# HOSTLIST=${1:-"hostlist.txt"}
-HOSTLIST="hostlist.txt"
+# exclude list
+EXCLUDE='apptainer*,docker*,facter,foreman*,puppet*,slurm*,vault*,edico*,containerd*'
 
-CMD=${1:-"get-patch.sh"}
-   
 write_state() {
   local now
   local state=$1
@@ -49,7 +47,7 @@ fi
 # create host log dir
 if [ ! -d "${LOGDIR}/${my_host}" ]
 then
-  mkdir "${LOGDIR}/${my_host}" > ${TMP_FILE} 2>&1
+  mkdir "${LOGDIR}/${my_host}" > ${TMP_FILE} 2>&1 
   retcode=$?
   if [ ${retcode} -ne 0 ]
   then
@@ -68,42 +66,38 @@ if [ $? -ne 0 ]; then
 fi
 rm -f ${TESTFILE}
 
-log_msg "Starting host run.."
-write_state RUNNING Launch
+log_msg "Launching yum update..."
+write_state RUNNING Patching
 
-# loop through
+# run yum update 
+yum -y update --exclude=${EXCLUDE} --skip-broken > ${TMP_FILE} 2> ${TMP_FILE}.err
+retcode=$?
+log_msg "Yum update complete"
+write_state RUNNING "yum update complete"
 
-echo -n "Beginning run: "
+case ${retcode} in
+  0) log_msg "Patching successful"
+     write_state RUNNING "Patching successful"
+    ;;
+  *) log_msg "Yum update exitted nonzero (${retcode})"
+     write_state COMPLETE "Yum-Update-Error"
+     cp ${TMP_FILE} ${TMP_FILE}.err ${LOGDIR}/${my_host}/
+     exit 1
+    ;;
+esac
 
-for i in  $(cat ${HOSTLIST})
-do 
-  echo -n "."
-  log_msg "Running on host ${i}..."
-  write_state RUNNING "Host: ${i}..."
- 
-  ping -c 1 -W 5 ${i} > /dev/null 2>&1
-  retcode=$?
-  if [[ "${retcode}" -ne 0 ]]
-  then
-    log_msg "Host ${i} - Ping timeout(${retcode})"
-    write_state RUNNING "Host: ${i} timeout(${retcode})"
-    continue
-  else
-    log_msg "Host ${i} - SSH Launch"
-    write_state RUNNING "Host: ${i} ssh launch"
-    ssh -n -o UserKnownHostsFile=/dev/null -o CheckHostIP=no -o StrictHostKeyChecking=no -o ConnectTimeout=1 ${i} "nohup /home/unix/sa-ferrara/Broad-repos/hjf-playground/linux/${CMD} &"
-    retcode=$?
-    if [[ "${retcode}" -ne 0 ]]
-    then
-      log_msg "Host ${i} - SSH non-zero(${retcode})"
-      write_state RUNNING "Host: ${i} ssh non-zero(${retcode})"
-    else
-      log_msg "Host ${i} - SSH Complete"
-      write_state RUNNING "Host: ${i} ssh Complete"
-    fi
-  fi
-done
+log_msg "Checking if reboot required"
+write_state RUNNING "Checking-if-reboot-required"
+needs-restarting -r > ${TMP_FILE} 2> ${TMP_FILE}.err
+retcode=$?
+if [ "${retcode}" -ne 0 ]
+then
+  log_msg "COMPLETE - Reboot required"
+  write_state COMPLETE "Reboot-Required"
+  cp ${TMP_FILE} ${LOGDIR}/${my_host}/reboot-list.txt
+else
+  log_msg "run COMPLETE"
+  write_state COMPLETE "Patch-complete"
+fi
 
-echo "DONE"
-log_msg "Launch run complete"
-write_state DONE Launch
+exit 0
