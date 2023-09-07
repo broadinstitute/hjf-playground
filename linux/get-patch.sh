@@ -20,6 +20,9 @@ TMP_FILE=$(mktemp /tmp/${my_host}.XXXX)
 # exclude list
 EXCLUDE='apptainer*,docker*,facter,foreman*,puppet*,slurm*,vault*,edico*,containerd*'
 
+# string for final status msg
+final_state=""
+
 write_state() {
   local now
   local state=$1
@@ -78,25 +81,38 @@ write_state RUNNING "Patch-check complete"
 
 case ${retcode} in
   100) log_msg "Needs PATCHING"
-       write_state RUNNING "Needs Patching"
-    ;;
-  0) log_msg "Fully patched"
-     write_state COMPLETE "Fully-Patched"
-     exit 0
-    ;;
-  *) log_msg "Unknown yum check-update return code"
+       final_state="${final_state} Needs-Patching"
+     
+       # get just list of patches
+       log_msg "Building patch list"
+       write_state RUNNING "Building-patchlist"
+       sed -n -e '/^$/,$p' < ${TMP_FILE}  | sed '/^[[:space:]]*$/d' > ${LOGDIR}/${my_host}/patch-list.txt
+  ;;
+  0) log_msg "Fully PATCHING"
+     final_state="${final_state} Fully-Patched"
+  ;;
+  *) log_msg "Unknown yum check-update return code (${retcode})"
      write_state COMPLETE "Unknown-Error"
      cp ${TMP_FILE} ${TMP_FILE}.err ${LOGDIR}/${my_host}/
      exit 0
-    ;;
+  ;;
 esac
 
-# if retcode 100 (patches need to beapply)
-# get just list of patches 
-log_msg "Building patch list"
-write_state RUNNING "Building-patchlist"
-sed -n -e '/^$/,$p' < ${TMP_FILE}  | sed '/^[[:space:]]*$/d' > ${LOGDIR}/${my_host}/patch-list.txt
+# alwasys check if reboot required in case previous patch never rebooted
+log_msg "Checking if reboot required"
+write_state RUNNING "Checking-if-reboot-required"
+needs-restarting -r > ${TMP_FILE} 2> ${TMP_FILE}.err
+retcode=$?
+if [ "${retcode}" -ne 0 ]
+then
+  log_msg "COMPLETE - Reboot required"
+  write_state COMPLETE "Reboot-Required"
+  cp ${TMP_FILE} ${LOGDIR}/${my_host}/reboot-list.txt
+  final_state="${final_state} Reboot-Required"
+fi
+
+rm -f ${TMP_FILE} ${TMP_FILE}.err
 
 log_msg "run COMPLETE"
-write_state COMPLETE "Needs Patching"
-exit ${retcode}
+write_state COMPLETE "${final_state}"
+exit 0
