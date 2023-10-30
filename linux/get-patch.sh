@@ -88,7 +88,7 @@ case ${retcode} in
        write_state RUNNING "Building-patchlist"
        sed -n -e '/^$/,$p' < ${TMP_FILE}  | sed '/^[[:space:]]*$/d' > ${LOGDIR}/${my_host}/patch-list.txt
   ;;
-  0) log_msg "Fully PATCHING"
+  0) log_msg "Fully PATCHED"
      final_state="${final_state} Fully-Patched"
      # clean out any left over patch list files
      cat /dev/null > ${LOGDIR}/${my_host}/patch-list.txt
