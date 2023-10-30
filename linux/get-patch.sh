@@ -90,6 +90,8 @@ case ${retcode} in
   ;;
   0) log_msg "Fully PATCHING"
      final_state="${final_state} Fully-Patched"
+     # clean out any left over patch list files
+     cat /dev/null > ${LOGDIR}/${my_host}/patch-list.txt
   ;;
   *) log_msg "Unknown yum check-update return code (${retcode})"
      write_state COMPLETE "Unknown-Error"
