@@ -111,6 +111,8 @@ then
   write_state COMPLETE "Reboot-Required"
   cp ${TMP_FILE} ${LOGDIR}/${my_host}/reboot-list.txt
   final_state="${final_state} Reboot-Required"
+else
+  rm -f ${LOGDIR}/${my_host}/reboot-list.txt
 fi
 
 rm -f ${TMP_FILE} ${TMP_FILE}.err
