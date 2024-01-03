@@ -56,9 +56,14 @@ get_node_state() {
   return $retcode
 }
 
-
-# get dragen software version
-dragen_version=$(get_dragen)
+if [ ! -x /opt/edico/bin/dragen ]
+then
+  # dragen software not installed so continue
+  dragen_version="not-installed"
+else
+  # get dragen software version
+  dragen_version=$(get_dragen)
+fi
 
 # make sure its not blank
 if [ -z "${dragen_version}" ]
