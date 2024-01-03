@@ -139,7 +139,7 @@ if [ "${retcode}" -ne 0 ]
 then
    log_msg "disable puppet non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "disable puppet returned non-zero status(${retcode)}"
+   write_state FAILED "disable puppet returned non-zero status(${retcode})"
    exit 1
 fi
 log_msg "Pupppet disabled"
@@ -154,7 +154,7 @@ if [ "${retcode}" -ne 0 ]
 then
    log_msg "yum erase returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "yum removed returned non-zero status(${retcode)}"
+   write_state FAILED "yum removed returned non-zero status(${retcode})"
    exit 1
 fi
 log_msg "Old Dragen software removed"
@@ -197,7 +197,7 @@ then
    #  - failed - exist FAILED
    log_msg "sosreport returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "sosreport returned non-zero status(${retcode)}"
+   write_state FAILED "sosreport returned non-zero status(${retcode})"
    exit 1
 fi
 log_msg "sosreport succeeded"
@@ -213,7 +213,7 @@ then
    #  - failed - exist FAILED
    log_msg "self_test returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "self_test returned non-zero status(${retcode)}"
+   write_state FAILED "self_test returned non-zero status(${retcode})"
    exit 1
 fi
 # grab status to get logfile paths
@@ -233,7 +233,7 @@ then
    #  - failed - exist FAILED
    log_msg "smoke_test returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "smoke_test returned non-zero status(${retcode)}"
+   write_state FAILED "smoke_test returned non-zero status(${retcode})"
    exit 1
 fi
 # grab status to get logfile paths
@@ -252,7 +252,7 @@ write_state RUNNING "smoke_test successful"
 #    #  - failed - exist FAILED
 #    log_msg "scontrol command returned non-zero (${retcode}) status"
 #    log_msg "${cmd_output}"
-#    write_state FAILED "scontrol command returned non-zero status(${retcode)}"
+#    write_state FAILED "scontrol command returned non-zero status(${retcode})"
 #    exit 1
 # fi
 
