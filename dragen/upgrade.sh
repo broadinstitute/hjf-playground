@@ -171,7 +171,7 @@ if [[ "${retcode}" -ne 0 && "${retcode}" -ne 2 ]]
 then
    log_msg "puppet apply returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "puppet apply returned non-zero status(${retcode)}"
+   write_state FAILED "puppet apply returned non-zero status(${retcode})"
    exit 1
 fi
 log_msg "Puppet apply succeeded"
