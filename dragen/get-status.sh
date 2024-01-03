@@ -7,6 +7,7 @@
 #  - in-progress upgrade
 #  
 LOGDIR="/home/unix/sa-ferrara/aou-upgrade-378"
+LOGDIR="/home/unix/sa-ferrara/komodo-upgrade"
 
 declare -A state_array=()
 
