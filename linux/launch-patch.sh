@@ -91,7 +91,7 @@ do
   else
     log_msg "Host ${i} - SSH Launch"
     write_state RUNNING "Host: ${i} ssh launch"
-    ssh -n -o UserKnownHostsFile=/dev/null -o CheckHostIP=no -o StrictHostKeyChecking=no -o ConnectTimeout=1 ${i} "nohup /home/unix/sa-ferrara/Broad-repos/hjf-playground/linux/${CMD} &"
+    ssh -n -o UserKnownHostsFile=/dev/null -o CheckHostIP=no -o StrictHostKeyChecking=no -o ConnectTimeout=1 ${i} nohup /home/unix/sa-ferrara/Broad-repos/hjf-playground/linux/${CMD} &
     retcode=$?
     if [[ "${retcode}" -ne 0 ]]
     then
