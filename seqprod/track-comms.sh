@@ -13,7 +13,7 @@ LOGDIR="/home/unix/sa-ferrara/seqprod-singlevlan"
 
 my_host=$(hostname --short)
 
-TMP_DIR=$(mktemp -d /tmp/test-XXXX)
+TMP_DIR=$(mktemp -d /tmp/tracker-XXXX)
 
 echo "Begin capture: $(date)"
 
@@ -63,6 +63,7 @@ done
 #
 # nfs mounts
 # get current mounted shares
+echo "Begin capturing NFS shares..."
 mount -t nfs | gawk '{ print $1","$3 }' | sort > ${TMP_DIR}/shares
 
 if [ ! -e ${LOGDIR}/${my_host}/shares.txt ]
@@ -87,4 +88,4 @@ rm -f ${TMP_DIR}/port-*.txt ${TMP_DIR}/conns-add ${TMP_DIR}/conns-new
 
 rmdir ${TMP_DIR}
 
-echo "End capture: $(date)
+echo "End capture: $(date)"
