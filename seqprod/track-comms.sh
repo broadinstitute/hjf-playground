@@ -6,7 +6,7 @@
 # it is intended to run on all seqprod gridengine compute nodes
 #  currently in use - both base-calling and operations nodes
 
-# the data is intended to determine the ACLs required for a new single VLAN 
+# the data is intended to determine the ACLs required for a new single VLAN
 #  that would host all seqprod gridengine compute nodes
 
 LOGDIR="/home/unix/sa-ferrara/seqprod-singlevlan"
@@ -20,11 +20,11 @@ echo "Begin capture: $(date)"
 if [ ! -d ${LOGDIR}/${my_host} ]
 then
    echo "Create host dir (${LOGDIR}/${my_host}) ..."
-   mkdir ${LOGDIR}/${my_host} 
+   mkdir ${LOGDIR}/${my_host}
 fi
 
 #
-# netstat -an 
+# netstat -an
 echo "Begin capturing network communications..."
 
 # capture current conns
@@ -53,7 +53,7 @@ do
      comm -13 ${LOGDIR}/${my_host}/${justfile} ${portfile} > ${TMP_DIR}/conns-add
      if [ -s ${TMP_DIR}/conns-add ]
      then
-        # new ips add to capture 
+        # new ips add to capture
         cat ${TMP_DIR}/conns-add ${LOGDIR}/${my_host}/${justfile} | sort > ${TMP_DIR}/conns-new
         cp ${TMP_DIR}/conns-new ${LOGDIR}/${my_host}/${justfile}
      fi
@@ -75,7 +75,7 @@ else
 
    if [ -s ${TMP_DIR}/shares-add ]
    then
-      # update main tracking 
+      # update main tracking
       # regen updated sorted list
       cat ${TMP_DIR}/shares-add ${LOGDIR}/${my_host}/shares.txt | sort > ${TMP_DIR}/shares-new
       cp ${TMP_DIR}/shares-new ${LOGDIR}/${my_host}/shares.txt
