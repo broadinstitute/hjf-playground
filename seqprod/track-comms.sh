@@ -15,6 +15,13 @@ my_host=$(hostname --short)
 
 TMP_DIR=$(mktemp -d /tmp/tracker-XXXX)
 
+# to add some variablity and not have all hosts capture info at exact
+#  same time.
+wait_min=$((1 + $RANDOM % 50))
+
+# sleep that many minutes
+sleep $(( $wait_min * 60 ))
+
 echo "Begin capture: $(date)"
 
 if [ ! -d ${LOGDIR}/${my_host} ]
