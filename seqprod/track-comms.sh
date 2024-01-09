@@ -37,7 +37,12 @@ echo "Begin capturing network communications..."
 # capture current conns
 netstat -n | gawk '$NF == "ESTABLISHED" { split($5,remote,":"); print remote[2] " " remote[1] } ' | while read port ip
 do
-   echo $ip >> ${TMP_DIR}/port-${port}.txt
+   # skip localhost comms
+   if [ "${ip}" -ne "127.0.0.1" ]
+   then
+     # not localhost
+     echo $ip >> ${TMP_DIR}/port-${port}.txt
+   fi
 done
 
 # sort files
