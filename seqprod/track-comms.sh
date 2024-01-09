@@ -94,8 +94,30 @@ else
    fi
 fi
 
+# capture inbound SSH connections
+#
+echo "Begin capturing SSH inbound"
+netstat -n | gawk '$NF == "ESTABLISHED" { split($4,local,":"); if ( local[2] == 22 ) { split($5,remote,":"); print remote[1] } } ' | sort | uniq > ${TMP_DIR}/ssh-comms
+
+if [ ! -e ${LOGDIR}/${my_host}/ssh.txt ]
+then
+   cp ${TMP_DIR}/ssh-comms ${LOGDIR}/${my_host}/ssh.txt
+else
+   # see if anything new
+   comm -13 ${LOGDIR}/${my_host}/ssh.txt ${TMP_DIR}/ssh-comms > ${TMP_DIR}/ssh-add
+
+   if [ -s ${TMP_DIR}/ssh-add ]
+   then
+      # update main tracking
+      # regen updated sorted list
+      cat ${TMP_DIR}/ssh-add ${LOGDIR}/${my_host}/ssh.txt | sort > ${TMP_DIR}/ssh-new
+      cp ${TMP_DIR}/ssh-new ${LOGDIR}/${my_host}/ssh.txt
+   fi
+fi
+
 # clean up
 rm -f ${TMP_DIR}/shares ${TMP_DIR}/shares-add ${TMP_DIR}/shares-new
+rm -f ${TMP_DIR}/ssh-comms ${TMP_DIR}/ssh-add ${TMP_DIR}/ssh-new
 rm -f ${TMP_DIR}/port-*.txt ${TMP_DIR}/conns-add ${TMP_DIR}/conns-new
 
 rmdir ${TMP_DIR}
