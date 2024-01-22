@@ -17,7 +17,7 @@ TMP_DIR=$(mktemp -d /tmp/tracker-XXXX)
 
 # to add some variablity and not have all hosts capture info at exact
 #  same time.
-wait_min=$((1 + $RANDOM % 50))
+wait_min=$((1 + $RANDOM % 10))
 
 # sleep that many minutes
 sleep $(( $wait_min * 60 ))
