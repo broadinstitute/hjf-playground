@@ -20,8 +20,8 @@ variable "broad_range_cidrs" {
 }
 
 variable "broad_routeable_net" {
-  type        = string
-  default     = "69.173.64.0/18"
+  type  = string
+  default = "69.173.64.0/18"
   description = "Broad's externally routable IP network"
 }
 
