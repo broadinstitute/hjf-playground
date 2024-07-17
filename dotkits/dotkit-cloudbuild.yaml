@@ -1,0 +1,64 @@
+
+#availableSecrets:
+#  secretManager:
+#  - versionName: projects/${PROJECT_ID}/secrets/${PROJECT_ID}-ap-service-account/versions/latest
+#    env: SA_JSON
+
+options:
+  env:
+    - DOTKIT_BUILD_JSON='${_DOTKIT_BUILD_JSON}'
+    - DOTKIT_BUILD_BUCKET=gs://broad-hjf-dotkit-build
+    - DOTKIT_SOURCE_BUCKET=gs://broad-hjf-dotkit-source
+    - DOTKIT_PKG_BUCKET=gs://broad-hjf-dotkit-package
+
+steps:
+  - id: dotkit-setup
+    name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
+    entrypoint: "/bin/bash"
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - '-c' 
+      - |-
+        echo "Get JSON, get source and set up environment"
+        mkdir /workspace/build
+        gsutil cat $${DOTKIT_SOURCE_BUCKET}/bcftools/bcftools-1.16.tar.bz2 | tar -C /workspace/build -xjvf -
+
+  - id: dotkit-build
+    name: 'us-docker.pkg.dev/automatic-potato-hjf/hjf-test-repo/dotkit-builder:latest'
+    entrypoint: "/bin/bash"
+    env:
+      - INSTALLPATH=/broad/software/free/Linux/redhat_7_x86_64/pkgs
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - -c
+      - | 
+        echo "Build, test, install software"
+        ls -al /workspace/build
+        cd /workspace/build/bcftools-1.16
+        echo "BUILD: Running configure ..."
+        ./configure --prefix=$${INSTALLPATH}/bcftools/bcftools_1.16
+        echo "BUILD: Running make all ..."
+        make
+        echo "BUILD: Running make test-all ..."
+        make test-all
+        echo "BUILD: Running make install ..."
+        make install
+        echo "Creating tarball ..."
+        cd $${INSTALLPATH}/bcftools
+        tar czf /workspace/bcftools_1.16.tar.gz bcftools_1.16
+
+  - id: dotkit-save
+    name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli'
+    entrypoint: "/bin/bash"
+    env:
+      - INSTALLPATH="/broad/software/free/Linux/redhat_7_x86_64/pkgs/bcftools/bcftools_1.16"
+    args: 
+      - '-eEuo'
+      - 'pipefail'
+      - -c 
+      - |
+        echo "Create tarball and write it to bucket"
+        gsutil cp /workspace/bcftools_1.16.tar.gz $${DOTKIT_PKG_BUCKET}/redhat_7_x86_64/bcftools/bcftools_1.16.tar.gz
+
