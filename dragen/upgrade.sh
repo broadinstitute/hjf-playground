@@ -3,16 +3,17 @@ set -o pipefail
 
 # set LOGDIR location
 LOGDIR="/home/unix/sa-ferrara/aou-upgrade-378"
+LOGDIR="/home/unix/sa-ferrara/komodo-upgrade"
 
 # how long to wait between checking for slurm node to drain
 SLEEP_TIME=300
 
 # target version string
-dragen_upgrade="07.021.604.3.7.8"
+dragen_upgrade="4.2.4-4-gfc89cfd2"
 
 # target puppet branch
 # puppet_branch="hf_bond_ap"
-puppet_branch="aou_378"
+puppet_branch="hf_komodo_20231213"
 
 # Get hostname
 my_host=$(hostname --short)
@@ -23,7 +24,7 @@ MY_PID=$$
 # functions
 
 get_dragen() {
-  local version=$(/opt/edico/bin/dragen --version |& awk '{ print $NF }')
+  local version=$(/opt/edico/bin/dragen --version |& awk '/^dragen Version/ {print $3}')
   echo $version
   return 0
 }
@@ -55,9 +56,14 @@ get_node_state() {
   return $retcode
 }
 
-
-# get dragen software version
-dragen_version=$(get_dragen)
+if [ ! -x /opt/edico/bin/dragen ]
+then
+  # dragen software not installed so continue
+  dragen_version="not-installed"
+else
+  # get dragen software version
+  dragen_version=$(get_dragen)
+fi
 
 # make sure its not blank
 if [ -z "${dragen_version}" ]
@@ -129,6 +135,21 @@ done
 log_msg "Ready to upgrade: (${my_host}:${slurm_state})"
 write_state BEGIN "Ready to upgrade"
 
+# turn off puppet
+log_msg "Turn off puppet during update"
+write_state RUNNING "Turning off puppet"
+cmd_output=$(systemctl stop puppet 2>&1)
+retcode=$?
+if [ "${retcode}" -ne 0 ]
+then
+   log_msg "disable puppet non-zero (${retcode}) status"
+   log_msg "${cmd_output}"
+   write_state FAILED "disable puppet returned non-zero status(${retcode})"
+   exit 1
+fi
+log_msg "Pupppet disabled"
+write_state RUNNING "Pupppet disabled"
+
 # yum remove current version of edico software
 log_msg "Removing old dragen software"
 write_state RUNNING "Removing old software"
@@ -138,7 +159,7 @@ if [ "${retcode}" -ne 0 ]
 then
    log_msg "yum erase returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "yum removed returned non-zero status(${retcode)}"
+   write_state FAILED "yum removed returned non-zero status(${retcode})"
    exit 1
 fi
 log_msg "Old Dragen software removed"
@@ -155,7 +176,7 @@ if [[ "${retcode}" -ne 0 && "${retcode}" -ne 2 ]]
 then
    log_msg "puppet apply returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "puppet apply returned non-zero status(${retcode)}"
+   write_state FAILED "puppet apply returned non-zero status(${retcode})"
    exit 1
 fi
 log_msg "Puppet apply succeeded"
@@ -181,7 +202,7 @@ then
    #  - failed - exist FAILED
    log_msg "sosreport returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "sosreport returned non-zero status(${retcode)}"
+   write_state FAILED "sosreport returned non-zero status(${retcode})"
    exit 1
 fi
 log_msg "sosreport succeeded"
@@ -197,7 +218,7 @@ then
    #  - failed - exist FAILED
    log_msg "self_test returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "self_test returned non-zero status(${retcode)}"
+   write_state FAILED "self_test returned non-zero status(${retcode})"
    exit 1
 fi
 # grab status to get logfile paths
@@ -217,7 +238,7 @@ then
    #  - failed - exist FAILED
    log_msg "smoke_test returned non-zero (${retcode}) status"
    log_msg "${cmd_output}"
-   write_state FAILED "smoke_test returned non-zero status(${retcode)}"
+   write_state FAILED "smoke_test returned non-zero status(${retcode})"
    exit 1
 fi
 # grab status to get logfile paths
@@ -236,7 +257,7 @@ write_state RUNNING "smoke_test successful"
 #    #  - failed - exist FAILED
 #    log_msg "scontrol command returned non-zero (${retcode}) status"
 #    log_msg "${cmd_output}"
-#    write_state FAILED "scontrol command returned non-zero status(${retcode)}"
+#    write_state FAILED "scontrol command returned non-zero status(${retcode})"
 #    exit 1
 # fi
 
