@@ -18,7 +18,7 @@ HOSTLOGDIR="${LOGDIR}/${my_host}"
 TMP_FILE=$(mktemp /tmp/${my_host}.XXXX)
 
 # exclude list
-EXCLUDE='apptainer*,docker*,facter,foreman*,puppet*,slurm*,vault*,edico*,containerd*'
+EXCLUDE='dragen*,podman*,apptainer*,docker*,facter,foreman*,puppet*,slurm*,vault*,edico*,containerd*'
 
 # string for final status msg
 final_state=""
